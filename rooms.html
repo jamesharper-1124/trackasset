@@ -21,7 +21,7 @@
     <script src="js/auth-guard.js?v=2"></script>
 
     <!-- HUGE VERSION BUMP FOR CACHE BUSTING -->
-    <script src="js/rooms.js?v=99"></script>
+    <script src="js/rooms.js?v=100"></script>
 </head>
 
 <body>
@@ -163,7 +163,14 @@
                             </svg>
                             Add Room
                         </a>
-                        <button id="btn-delete-selected" class="btn-danger" style="display: none;">
+                        <button id="btn-delete-selected" class="btn-danger"
+                            style="display: none; align-items: center; gap: 0.5rem; background-color: #ef4444; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; border: none; font-size: 0.875rem; cursor: pointer;">
+                            <svg class="icon-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                style="width: 1.25rem; height: 1.25rem;">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                </path>
+                            </svg>
                             Delete Selected (<span id="selected-count">0</span>)
                         </button>
                     </div>
