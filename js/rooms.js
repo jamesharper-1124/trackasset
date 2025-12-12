@@ -220,6 +220,7 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             photoUrl = CONFIG.apiUrl('/images/rooms/default.png');
         }
+        console.log(`[DEBUG] Room: ${room.room_name}, Raw Path: ${room.room_photo}, Final URL: ${photoUrl}`);
 
         div.innerHTML = `
                 <div class="card-img-wrapper">
