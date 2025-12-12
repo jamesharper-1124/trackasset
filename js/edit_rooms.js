@@ -104,12 +104,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
             let photo = user.profile_photo || 'images/profile_pic/default.png';
             if (!photo.startsWith('http')) {
-                const path = photo.startsWith('/') ? photo : '/' + photo;
-                const storagePath = path.includes('storage') ? path : '/storage' + path;
-                if (!path.includes('default.png')) {
-                    photo = CONFIG.apiUrl(storagePath);
+                const path = photo.startsWith('/') ? photo.substring(1) : photo;
+                if (path.includes('storage')) {
+                    photo = CONFIG.apiUrl('/' + path);
+                } else if (path.startsWith('images/')) {
+                    photo = CONFIG.apiUrl('/' + path);
                 } else {
-                    photo = CONFIG.apiUrl('/images/profile_pic/default.png');
+                    photo = CONFIG.apiUrl('/storage/' + path);
                 }
             }
 
@@ -151,9 +152,14 @@ document.addEventListener('DOMContentLoaded', function () {
         if (room.room_photo) {
             let photoUrl = room.room_photo;
             if (!photoUrl.startsWith('http')) {
-                const path = photoUrl.startsWith('/') ? photoUrl : '/' + photoUrl;
-                const storagePath = path.includes('storage') ? path : '/storage' + path;
-                photoUrl = CONFIG.apiUrl(storagePath);
+                const path = photoUrl.startsWith('/') ? photoUrl.substring(1) : photoUrl;
+                if (path.includes('storage')) {
+                    photoUrl = CONFIG.apiUrl('/' + path);
+                } else if (path.startsWith('images/')) {
+                    photoUrl = CONFIG.apiUrl('/' + path);
+                } else {
+                    photoUrl = CONFIG.apiUrl('/storage/' + path);
+                }
             }
             previewImg.src = photoUrl;
         }
@@ -177,12 +183,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     let photo = manager.profile_photo || 'images/profile_pic/default.png';
                     if (!photo.startsWith('http')) {
-                        const path = photo.startsWith('/') ? photo : '/' + photo;
-                        const storagePath = path.includes('storage') ? path : '/storage' + path;
-                        if (!path.includes('default.png')) {
-                            photo = CONFIG.apiUrl(storagePath);
+                        const path = photo.startsWith('/') ? photo.substring(1) : photo;
+                        if (path.includes('storage')) {
+                            photo = CONFIG.apiUrl('/' + path);
+                        } else if (path.startsWith('images/')) {
+                            photo = CONFIG.apiUrl('/' + path);
                         } else {
-                            photo = CONFIG.apiUrl('/images/profile_pic/default.png');
+                            photo = CONFIG.apiUrl('/storage/' + path);
                         }
                     }
 
