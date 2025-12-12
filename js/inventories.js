@@ -49,6 +49,16 @@ document.addEventListener('DOMContentLoaded', function () {
         const isAdmin = (currentUser.role === 'admin');
         const isUser = (currentUser.role === 'user');
 
+        // Show "Add Inventory" button if not a basic user
+        const addBtn = document.getElementById('add-inventory-btn');
+        if (addBtn) {
+            if (!isUser) {
+                addBtn.style.display = 'inline-flex';
+            } else {
+                addBtn.style.display = 'none';
+            }
+        }
+
         // A. Assigned Inventories
         if (!isUser && assignedContainer) {
             assignedSection.style.display = 'block';
