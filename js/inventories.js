@@ -56,14 +56,16 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         const isAdmin = (currentUser.role === 'admin');
+        const isStaff = (currentUser.role === 'staff');
         const isUser = (currentUser.role === 'user');
 
-        console.log('[DEBUG] Role:', currentUser.role, 'isAdmin:', isAdmin, 'isUser:', isUser);
+        console.log('[DEBUG] Role:', currentUser.role, 'isAdmin:', isAdmin, 'isStaff:', isStaff, 'isUser:', isUser);
 
-        // Show "Add Inventory" button if not a basic user
+        // Show "Add Inventory" button if Admin or Staff
         const addBtn = document.getElementById('add-inventory-btn');
         if (addBtn) {
-            if (!isUser) {
+            // Only Admin and Staff can add inventories
+            if (isAdmin || isStaff) {
                 addBtn.style.display = 'inline-flex';
             } else {
                 addBtn.style.display = 'none';
@@ -71,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         // A. Assigned Inventories
-        if (!isUser && assignedContainer) {
+        if ((isAdmin || isStaff) && assignedContainer) {
             assignedSection.style.display = 'block';
             assignedContainer.innerHTML = '';
             if (userInventories && userInventories.length > 0) {
@@ -134,8 +136,20 @@ document.addEventListener('DOMContentLoaded', function () {
         if (item.status_condition === 'N.G') statusClass = 'status-danger';
 
         let actionsHtml = '';
+
+        // Report Button (Always Visible)
+        // Adjust href to point to add_report.html with inventory_id pre-filled
+        const reportBtn = `
+            <a href="add_report.html?inventory_id=${item.id}" class="btn-icon-action report" title="Report Issue" style="color: #ef4444;">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+            </a>
+        `;
+
         if (canEdit) {
             actionsHtml = `
+                ${reportBtn}
                 <a href="edit_inventory.html?id=${item.id}" class="btn-icon-action edit" title="Edit">
                     <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
@@ -148,7 +162,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 </button>
             `;
         } else {
-            actionsHtml = '<span style="font-size: 0.75rem; color: #9ca3af; font-style: italic;">Read Only</span>';
+            // Read Only users (User role or Staff viewing available) STILL see Report button
+            actionsHtml = `
+                ${reportBtn}
+                <!-- <span style="font-size: 0.75rem; color: #9ca3af; font-style: italic;">Read Only</span> -->
+            `;
         }
 
         div.innerHTML = `
@@ -175,8 +193,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     <div class="status-wrapper">
                         <span class="card-status ${statusClass}">${item.status_condition}</span>
                     </div>
-                    <div class="remarks-wrapper">
-                        <span class="remarks-text">Remarks: ${item.remarks || 'NONE'}</span>
+                    <div class="remarks-wrapper" style="overflow-x: auto; white-space: nowrap; max-width: 100%; display: block; margin-top: 0.5rem; padding-bottom: 0.25rem;">
+                        <span class="remarks-text" style="color: #6b7280; font-size: 0.875rem; font-style: italic;">Remarks: ${item.remarks || 'NONE'}</span>
                     </div>
                 </div>
                 <div class="h-card-actions">
