@@ -141,11 +141,12 @@
                     <form id="add-inventory-form" enctype="multipart/form-data">
                         <div class="form-grid">
 
-                            <!-- Image Upload (Premium) -->
-                            <div class="form-group">
-                                <label class="form-label">Item Image</label>
-                                <div class="image-upload-wrapper">
-                                    <img src="images/inventory/default.png" alt="Preview" class="image-preview">
+                            <!-- Left Column: Item Image -->
+                            <div class="form-group" style="display: flex; flex-direction: column; align-items: center;">
+                                <label class="form-label" style="align-self: flex-start;">Item Image</label>
+                                <div class="image-upload-wrapper" style="cursor: pointer;">
+                                    <img src="images/inventory/default.png" alt="Preview" class="image-preview"
+                                        style="object-fit: contain;">
                                     <div class="upload-placeholder">
                                         <svg class="upload-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -156,11 +157,12 @@
                                         </svg>
                                         <span class="upload-text">Change Image</span>
                                     </div>
-                                    <input type="file" name="inventory_photo" class="file-input-hidden">
+                                    <input type="file" name="inventory_photo" class="file-input-hidden" accept="image/*"
+                                        style="display:none;">
                                 </div>
                             </div>
 
-                            <!-- Fields Container -->
+                            <!-- Right Column: Details -->
                             <div style="display: flex; flex-direction: column; gap: 1.5rem;">
                                 <!-- Name -->
                                 <div>
