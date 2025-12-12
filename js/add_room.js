@@ -59,8 +59,13 @@ document.addEventListener('DOMContentLoaded', function () {
             url: CONFIG.apiUrl('/api/users/data'),
             method: 'GET',
             success: function (data) {
-                if (data && data.users) {
-                    populateUserSelect(data.users);
+                if (data) {
+                    // Combine Admins and Staffs only
+                    const authorizedUsers = [
+                        ...(data.admins || []),
+                        ...(data.staffs || [])
+                    ];
+                    populateUserSelect(authorizedUsers);
                 }
             },
             error: function (xhr) {
