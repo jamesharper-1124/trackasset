@@ -23,7 +23,7 @@ $(document).ajaxSuccess(function (event, xhr, settings) {
                 window.hasAlertedSession = true;
                 alert('Session Expired. Please log in again.');
                 localStorage.removeItem('auth_token');
-                window.location.href = '/login';
+                window.location.href = 'login.html';
             }
         }
     }
@@ -39,29 +39,35 @@ $(document).ajaxError(function (event, jqxhr, settings, thrownError) {
 
             // Clear token and redirect
             localStorage.removeItem('auth_token');
-            window.location.href = '/login';
+            window.location.href = 'login.html';
         }
     }
 });
 
 // 3. Immediate Token Check + Validation (Runs before DOM Ready)
 (function () {
-    const isPublicPage = window.location.pathname.match(/^\/(login|register|verify|forgot-password|reset-password)$/);
+    // Current Page Check: Adjust regex for .html files
+    const isPublicPage = window.location.pathname.match(/(login\.html|register\.html|verify_account\.html|forgot-password\.html|reset-password\.html)$/);
     const token = localStorage.getItem('auth_token');
 
     if (!token && !isPublicPage) {
         window.stop();
-        alert('Session Expired. Please log in again.');
-        window.location.href = '/login?error=session_expired';
+        // alert('Session Expired. Please log in again.'); // Optional: too annoying on load
+        window.location.href = 'login.html?error=session_expired';
     } else if (token && !isPublicPage) {
         // Validate Token with Server
         $.ajax({
-            url: '/api/user',
+            url: CONFIG.apiUrl('/api/user'), // USE CONFIG!
             method: 'GET',
             headers: { 'Authorization': 'Bearer ' + token },
-            success: function () {
-                // Token is valid, proceed.
-                console.log('Token validated.');
+            success: function (user) {
+                // Token is valid.
+                // Optional: Update UI with user info immediately if needed
+                if (user && user.role === 'admin') {
+                    // Show admin links if hidden
+                    const navUsers = document.getElementById('nav-users');
+                    if (navUsers) navUsers.style.display = 'block';
+                }
             },
             error: function (xhr) {
                 // 401 is now handled by the global ajaxError handler defined above.
@@ -81,16 +87,16 @@ $(document).ready(function () {
         e.preventDefault();
 
         $.ajax({
-            url: '/api/logout',
+            url: CONFIG.apiUrl('/api/logout'), // USE CONFIG!
             method: 'POST',
             success: function () {
                 localStorage.removeItem('auth_token');
-                window.location.href = '/login';
+                window.location.href = 'login.html';
             },
             error: function () {
                 // Force logout even if API fails
                 localStorage.removeItem('auth_token');
-                window.location.href = '/login';
+                window.location.href = 'login.html';
             }
         });
     });
@@ -116,7 +122,7 @@ $(document).ready(function () {
         if (!token) {
             console.log('Pre-navigation check: Token missing. Redirecting to login.');
             e.preventDefault();
-            window.location.href = '/login?error=no_token';
+            window.location.href = 'login.html?error=no_token';
         }
     });
 
