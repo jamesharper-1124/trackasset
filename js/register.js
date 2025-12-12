@@ -19,7 +19,7 @@ $(document).ready(function () {
         };
 
         $.ajax({
-            url: '/api/register',
+            url: CONFIG.apiUrl('/api/register'),
             method: 'POST',
             data: JSON.stringify(formData),
             contentType: 'application/json',
@@ -27,9 +27,8 @@ $(document).ready(function () {
                 'Accept': 'application/json'
             },
             success: function (response) {
-                // Success - Redirect to verify page or login
-                // Assuming the API returns a redirect URL or we default to verification
-                window.location.href = response.redirect || '/verify';
+                // Success - Redirect to verify page
+                window.location.href = 'verify_account.html?email=' + encodeURIComponent(formData.email);
             },
             error: function (xhr) {
                 let message = 'Registration failed.';
