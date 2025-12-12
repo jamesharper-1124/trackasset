@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', function () {
     const userSelect = document.getElementById('user-select');
     const selectedUsersContainer = document.getElementById('selected-users-container');
