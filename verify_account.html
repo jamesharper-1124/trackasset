@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Account - TrackAsset</title>
+
+    <!-- Tailwind CSS (Layout) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Config (Must be loaded first) -->
+    <script src="js/config.js"></script>
+
+    <!-- Auth Guard -->
+    <script src="js/guest-guard.js"></script>
+
+    <script src="js/verify.js"></script>
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center min-h-screen px-4">
+    <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
+        <!-- Logo -->
+        <div class="flex justify-center mb-6">
+            <img src="images/inventory/default.png" alt="App Logo"
+                class="h-20 w-20 rounded-full object-cover border-2 border-indigo-500">
+        </div>
+        <h2 class="text-2xl font-bold mb-6 text-center">Verify Your Email</h2>
+
+        <p class="mb-4 text-gray-600 text-center">
+            We sent a code to <strong id="user-email">your email</strong>.
+        </p>
+
+        <div id="alert-container"></div>
+
+        <form id="verify-form">
+            <input type="hidden" name="email" id="email-input">
+
+            <div class="mb-6">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Verification Code</label>
+                <input type="text" name="code" placeholder="123456"
+                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-center text-xl tracking-widest"
+                    required>
+            </div>
+
+            <button
+                class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded w-full focus:outline-none focus:shadow-outline transition duration-200"
+                type="submit">
+                Verify Account
+            </button>
+        </form>
+
+        <div class="mt-4 text-center">
+            <a class="text-sm text-blue-500 hover:text-blue-800" href="login.html">
+                Back to Login
+            </a>
+        </div>
+    </div>
+</body>
+
+</html>
