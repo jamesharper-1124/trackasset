@@ -57,6 +57,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Elements
     const pageTitle = document.getElementById('page-title');
+    const roomHeader = document.getElementById('room-header'); // New sub-header
     const grid = document.getElementById('inventory-grid');
     const loading = document.getElementById('loading');
     const noData = document.getElementById('no-data');
@@ -72,7 +73,11 @@ document.addEventListener('DOMContentLoaded', function () {
         success: function (data) {
             loading.style.display = 'none';
             if (data && data.room) {
-                pageTitle.textContent = `Inventories in ${data.room.room_name}`;
+                // Update sub-header instead of main title
+                if (roomHeader) {
+                    roomHeader.textContent = `Available Inventories (in ${data.room.room_name})`;
+                }
+
                 if (data.room.inventories && data.room.inventories.length > 0) {
                     allInventories = data.room.inventories;
                     renderInventories(allInventories);
@@ -102,8 +107,6 @@ document.addEventListener('DOMContentLoaded', function () {
             card.style.display = 'flex';
             card.style.flexDirection = 'column';
 
-            // Image Handling
-            // Image Handling
             let photoUrl = inv.inventory_photo || 'images/inventory/default.png';
             if (!photoUrl.startsWith('http')) {
                 const path = photoUrl.startsWith('/') ? photoUrl.substring(1) : photoUrl;
@@ -117,9 +120,9 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             // Status Color
-            let statusColor = '#10b981'; // green
-            if (inv.status === 'Damaged') statusColor = '#ef4444'; // red
-            if (inv.status === 'Lost') statusColor = '#f59e0b'; // amber
+            let statusColor = '#10b981'; // green (Good)
+            if (inv.status === 'Needs Attention') statusColor = '#f59e0b'; // amber
+            if (inv.status === 'N.G') statusColor = '#ef4444'; // red
 
             card.innerHTML = `
                 <div class="card-img-wrapper" style="position:relative;">
@@ -158,3 +161,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     radioButtons.forEach(radio => {
+        radio.addEventListener('change', filterInventories);
+    });
+});
