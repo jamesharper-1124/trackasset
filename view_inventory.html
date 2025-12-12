@@ -99,8 +99,8 @@
                                 d="M4 6h16M4 12h16M4 18h16"></path>
                         </svg>
                     </button>
-                    <!-- Will be populated by JS -->
-                    <h2 class="page-title" id="page-title">Inventories in...</h2>
+                    <!-- Static Title -->
+                    <h2 class="page-title" id="page-title">View Inventories</h2>
                 </div>
 
                 <!-- Right: User Profile -->
@@ -139,6 +139,12 @@
             <!-- Main Content Area -->
             <main class="content-area">
 
+                <!-- Dynamic Sub Header -->
+                <div style="margin-bottom: 2rem;">
+                    <h3 id="room-header" style="font-size: 1.5rem; font-weight: 600; color: #1f2937;">Available
+                        Inventories</h3>
+                </div>
+
                 <!-- Controls -->
                 <div
                     style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;">
@@ -162,12 +168,12 @@
                                 style="font-size:0.875rem;">Good</span>
                         </label>
                         <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer;">
-                            <input type="radio" name="status-filter" value="Damaged"> <span
-                                style="font-size:0.875rem;">Damaged</span>
+                            <input type="radio" name="status-filter" value="Needs Attention"> <span
+                                style="font-size:0.875rem;">Needs Attention</span>
                         </label>
                         <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer;">
-                            <input type="radio" name="status-filter" value="Lost"> <span
-                                style="font-size:0.875rem;">Lost</span>
+                            <input type="radio" name="status-filter" value="N.G"> <span
+                                style="font-size:0.875rem;">N.G</span>
                         </label>
                     </div>
                 </div>
