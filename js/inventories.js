@@ -193,8 +193,17 @@ document.addEventListener('DOMContentLoaded', function () {
                     <div class="status-wrapper">
                         <span class="card-status ${statusClass}">${item.status_condition}</span>
                     </div>
-                    <div class="remarks-wrapper" style="overflow-x: auto; white-space: nowrap; max-width: 100%; display: block; margin-top: 0.5rem; padding-bottom: 0.25rem;">
-                        <span class="remarks-text" style="color: #6b7280; font-size: 0.875rem; font-style: italic;">Remarks: ${item.remarks || 'NONE'}</span>
+                    <div class="remarks-wrapper">
+                        <!-- 'marquee-animation' class is defined in inventories.css -->
+                         <div style="overflow: hidden; white-space: nowrap;">
+                            <span class="remarks-text" style="display: inline-block; padding-left: 0; animation: marquee 10s linear infinite;">Remarks: ${item.remarks || 'NONE'}</span>
+                         </div>
+                         <style>
+                            @keyframes marquee {
+                                0% { transform: translateX(100%); }
+                                100% { transform: translateX(-100%); }
+                            }
+                         </style>
                     </div>
                 </div>
                 <div class="h-card-actions">
