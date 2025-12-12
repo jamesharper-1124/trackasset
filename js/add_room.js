@@ -213,6 +213,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const formData = new FormData(this);
 
+            // Explicitly attach file with NEW NAME (Room Name)
+            const fileInput = document.getElementById('room_photo_input');
+            const roomNameInput = document.querySelector('input[name="room_name"]');
+
+            if (fileInput && fileInput.files[0]) {
+                const file = fileInput.files[0];
+                let fileName = file.name;
+
+                if (roomNameInput && roomNameInput.value.trim() !== "") {
+                    // Sanitize room name to be safe for filenames
+                    const safeName = roomNameInput.value.trim().replace(/[^a-z0-9]/gi, '_').toLowerCase();
+                    const extension = file.name.split('.').pop();
+                    fileName = `${safeName}.${extension}`;
+                }
+
+                formData.set('room_photo', file, fileName);
+            }
+
             $.ajax({
                 url: CONFIG.apiUrl('/api/rooms'), // Standard REST endpoint
                 method: 'POST',
