@@ -1,5 +1,6 @@
 
 document.addEventListener('DOMContentLoaded', function () {
+    console.log("DEBUG: rooms.js v100 loaded"); // Proof of life
     const token = localStorage.getItem('auth_token');
     if (!token) {
         // auth-guard should handle this, but just in case
