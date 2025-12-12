@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // --------------------------------------------------------------------------
     // Dashboard Data Fetching (AJAX)
     // --------------------------------------------------------------------------
-    const dashboardDataUrl = '/api/dashboard/data'; // Adjust if route usage differs
+    const dashboardDataUrl = CONFIG.apiUrl('/api/dashboard/data'); // Adjust if route usage differs
 
     // Only fetch if we are actually on the dashboard (check for an element unique to it)
     if (document.getElementById('chart-circle')) {
@@ -71,7 +71,26 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function renderDashboard(data) {
-        // 1. New Inventories
+        // --- Calculate Stats for Top Row ---
+        const stats = data.stats || {};
+        const total = data.totalInventories || 0;
+
+        const goodCount = (stats['GOOD'] || 0) + (stats['Good Condition'] || 0);
+        const attentionCount = (stats['NEEDS ATTENTION'] || 0) + (stats['Needs Attention Condition'] || 0) + (stats['Needs Repair'] || 0) + (stats['N.G'] || 0) + (stats['N.G. Condition'] || 0) + (stats['Broken'] || 0);
+        // Note: attentionCount includes both "Attention" and "Bad/N.G" for the summary card "Attention Needed"
+
+        // Update Top Stats
+        const statTotal = document.getElementById('stat-total-assets');
+        if (statTotal) statTotal.textContent = total;
+
+        const statAttention = document.getElementById('stat-attention');
+        if (statAttention) statAttention.textContent = attentionCount;
+
+        const statGood = document.getElementById('stat-good');
+        if (statGood) statGood.textContent = goodCount;
+
+
+        // 1. New Inventories (Recent Activity)
         const inventoryBody = document.getElementById('new-inventories-body');
         if (inventoryBody) {
             inventoryBody.innerHTML = '';
@@ -86,30 +105,35 @@ document.addEventListener('DOMContentLoaded', function () {
                     inventoryBody.appendChild(tr);
                 });
             } else {
-                inventoryBody.innerHTML = '<tr><td colspan="2" class="text-secondary text-center">No recent inventories</td></tr>';
+                inventoryBody.innerHTML = '<tr><td colspan="2" class="text-secondary text-center" style="padding:1rem;">No recent inventories</td></tr>';
             }
         }
 
         // 2. New Users
         const usersList = document.getElementById('new-users-list');
+        const usersCard = document.getElementById('card-new-users');
+
         if (usersList) {
             usersList.innerHTML = '';
             if (data.newUsers && data.newUsers.length > 0) {
+                if (usersCard) usersCard.style.display = 'block'; // Block for content-card style
+
                 data.newUsers.forEach(user => {
                     const li = document.createElement('li');
                     li.className = 'user-item';
+                    const role = user.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : 'User';
                     li.innerHTML = `
                         <span class="font-medium text-dark">${user.firstname} ${user.lastname}</span>
-                        <span class="user-role">${user.role.charAt(0).toUpperCase() + user.role.slice(1)}</span>
+                        <span class="user-role">${role}</span>
                     `;
                     usersList.appendChild(li);
                 });
             } else {
-                usersList.innerHTML = '<li class="text-secondary text-center">No recent users</li>';
+                if (usersCard) usersCard.style.display = 'none';
             }
         }
 
-        // 3. Problem Inventories
+        // 3. Problem Inventories (Critical Issues)
         const problemsBody = document.getElementById('problem-inventories-body');
         if (problemsBody) {
             problemsBody.innerHTML = '';
@@ -119,38 +143,42 @@ document.addEventListener('DOMContentLoaded', function () {
                     const invName = report.inventory ? report.inventory.inventory_name : 'Previously Deleted';
                     tr.innerHTML = `
                         <td class="font-medium text-dark">${invName}</td>
-                        <td class="text-red font-medium">${report.remarks}</td>
+                        <td class="text-red-600 font-medium">${report.remarks}</td>
                      `;
                     problemsBody.appendChild(tr);
                 });
             } else {
-                problemsBody.innerHTML = '<tr><td colspan="2" class="text-secondary text-center">No issues reported</td></tr>';
+                problemsBody.innerHTML = '<tr><td colspan="2" class="text-secondary text-center" style="padding:1rem;">No issues reported</td></tr>';
             }
         }
 
         // 4. Chart Statistics
-        renderChart(data);
+        renderChart(data, goodCount, attentionCount, total);
     }
 
-    function renderChart(data) {
+    function renderChart(data, goodCount, attentionCount, total) {
+        // Recalculate or pass from above (passing is more efficient)
+        // Note: In renderChart logic, attention vs NG was separated for colors. 
+        // For the top card we grouped them. 
+        // Let's re-separate for chart to keep the 3-color scheme if desired, or skip.
+        // The original chart had 3 colors: Green, Yellow, Red.
+
         const stats = data.stats || {};
-        const total = data.totalInventories > 0 ? data.totalInventories : 1;
+        // Re-calculate strictly for chart segments
+        const pureGood = (stats['GOOD'] || 0) + (stats['Good Condition'] || 0);
+        const pureAttention = (stats['NEEDS ATTENTION'] || 0) + (stats['Needs Attention Condition'] || 0) + (stats['Needs Repair'] || 0);
+        const pureNG = (stats['N.G'] || 0) + (stats['N.G. Condition'] || 0) + (stats['Broken'] || 0);
 
-        // Count aggregation matching PHP logic
-        const goodCount = (stats['GOOD'] || 0) + (stats['Good Condition'] || 0);
-        const attentionCount = (stats['NEEDS ATTENTION'] || 0) + (stats['Needs Attention Condition'] || 0) + (stats['Needs Repair'] || 0);
-        const ngCount = (stats['N.G'] || 0) + (stats['N.G. Condition'] || 0) + (stats['Broken'] || 0);
+        // Safety for div
+        const safeTotal = total > 0 ? total : 1;
 
-        const goodPercent = (goodCount / total) * 100;
-        const attentionPercent = (attentionCount / total) * 100;
-        const ngPercent = (ngCount / total) * 100;
-
-        const p1 = goodPercent;
-        const p2 = goodPercent + attentionPercent;
+        const p1 = (pureGood / safeTotal) * 100;
+        // p2 needs to be accumulation of Good + Attention
+        const p2 = p1 + ((pureAttention / safeTotal) * 100);
 
         // Update Total Label
         const totalLabel = document.getElementById('chart-total-label');
-        if (totalLabel) totalLabel.textContent = data.totalInventories;
+        if (totalLabel) totalLabel.textContent = total;
 
         // Update Circle Gradient
         const chartCircle = document.getElementById('chart-circle');
@@ -164,24 +192,24 @@ document.addEventListener('DOMContentLoaded', function () {
             legend.innerHTML = `
                 <div class="legend-item">
                     <div style="display:flex; align-items:center;">
-                        <span class="legend-color bg-green"></span>
-                        <span class="text-dark">Good Condition</span>
+                        <span class="legend-color bg-green-100" style="background:#10B981"></span>
+                        <span class="text-dark">Good</span>
                     </div>
-                    <span class="font-medium text-dark">${Math.round(goodPercent)}%</span>
+                    <span class="font-medium text-dark">${Math.round(p1)}%</span>
                 </div>
                 <div class="legend-item">
                     <div style="display:flex; align-items:center;">
-                        <span class="legend-color bg-yellow"></span>
-                        <span class="text-dark">Needs Attention Condition</span>
+                        <span class="legend-color bg-yellow" style="background:#F59E0B"></span>
+                        <span class="text-dark">Attention</span>
                     </div>
-                    <span class="font-medium text-dark">${Math.round(attentionPercent)}%</span>
+                    <span class="font-medium text-dark">${Math.round((pureAttention / safeTotal) * 100)}%</span>
                 </div>
                 <div class="legend-item">
                     <div style="display:flex; align-items:center;">
-                        <span class="legend-color bg-red"></span>
-                        <span class="text-dark">N.G. Condition</span>
+                        <span class="legend-color bg-red" style="background:#EF4444"></span>
+                        <span class="text-dark">Critical</span>
                     </div>
-                    <span class="font-medium text-dark">${Math.round(ngPercent)}%</span>
+                    <span class="font-medium text-dark">${Math.round((pureNG / safeTotal) * 100)}%</span>
                 </div>
             `;
         }
