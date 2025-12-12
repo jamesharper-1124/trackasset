@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // --------------------------------------------------------------------------
     // Dashboard Data Fetching (AJAX)
     // --------------------------------------------------------------------------
-    const dashboardDataUrl = CONFIG.apiUrl('/api/dashboard/data'); // Adjust if route usage differs
+    const dashboardDataUrl = '/api/dashboard/data'; // Adjust if route usage differs
 
     // Only fetch if we are actually on the dashboard (check for an element unique to it)
     if (document.getElementById('chart-circle')) {

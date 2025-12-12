@@ -62,11 +62,19 @@ $(document).ajaxError(function (event, jqxhr, settings, thrownError) {
             headers: { 'Authorization': 'Bearer ' + token },
             success: function (user) {
                 // Token is valid.
-                // Optional: Update UI with user info immediately if needed
+                console.log('Token validated:', user);
+
+                // Update Header User Name
+                const nameDisplay = document.getElementById('user-name-display');
+                if (nameDisplay && user.firstname) {
+                    nameDisplay.textContent = user.firstname;
+                }
+
+                // Update User Role/Admin Links
                 if (user && user.role === 'admin') {
                     // Show admin links if hidden
                     const navUsers = document.getElementById('nav-users');
-                    if (navUsers) navUsers.style.display = 'block';
+                    if (navUsers) navUsers.style.display = 'flex'; // Use flex to match .nav-link style
                 }
             },
             error: function (xhr) {
