@@ -109,8 +109,126 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 2rem;
+    padding: 0 1rem;
+    /* Reduced padding base */
     flex-shrink: 0;
+}
+
+.header-left,
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.sidebar-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-secondary);
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar-toggle:hover {
+    color: var(--text-primary);
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 99px;
+    border: 1px solid transparent;
+    /* default transparent */
+    transition: 0.2s;
+}
+
+.user-profile:hover {
+    background: #f8fafc;
+    border-color: var(--border-color);
+}
+
+.profile-img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.user-name {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #334155;
+}
+
+/* Cog Button Style Reset */
+#dropdown-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border-radius: 50%;
+    transition: background 0.2s;
+}
+
+#dropdown-btn:hover {
+    background: #f1f5f9;
+}
+
+/* Mobile Optimization (350px support) */
+@media (max-width: 480px) {
+    .hide-on-mobile {
+        display: none !important;
+    }
+
+    .page-title {
+        font-size: 1.1rem;
+    }
+
+    /* Slightly smaller */
+    .user-name {
+        display: none;
+    }
+
+    /* Hide name on very small screens to save space */
+    .top-header {
+        padding: 0 0.75rem;
+    }
+
+    /* Stats Grid 1 column on tiny screens */
+    .stats-overview {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    /* Adjust padding for tiny screens */
+    .content-area {
+        padding: 0.75rem;
+    }
+
+    /* Mini Stats Compact */
+    .mini-stat-card {
+        padding: 0.75rem;
+    }
+
+    .stat-icon {
+        width: 32px;
+        height: 32px;
+        margin-right: 0.75rem;
+    }
+
+    .stat-icon svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .stat-value {
+        font-size: 1.1rem;
+    }
 }
 
 /* --- NEW Informative Layout Styles --- */
