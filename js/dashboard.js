@@ -75,11 +75,16 @@ document.addEventListener('DOMContentLoaded', function () {
         const stats = data.stats || {};
         const total = data.totalInventories || 0;
 
+        // 1. GOOD (Green)
         const goodCount = (stats['GOOD'] || 0) + (stats['Good Condition'] || 0);
-        const attentionCount = (stats['NEEDS ATTENTION'] || 0) + (stats['Needs Attention Condition'] || 0) + (stats['Needs Repair'] || 0) + (stats['N.G'] || 0) + (stats['N.G. Condition'] || 0) + (stats['Broken'] || 0);
-        // Note: attentionCount includes both "Attention" and "Bad/N.G" for the summary card "Attention Needed"
 
-        // Update Top Stats
+        // 2. ATTENTION (Yellow) - Needs Attention / Repair
+        const attentionCount = (stats['NEEDS ATTENTION'] || 0) + (stats['Needs Attention Condition'] || 0) + (stats['Needs Repair'] || 0);
+
+        // 3. NOT GOOD (Red) - Broken / N.G.
+        const ngCount = (stats['N.G'] || 0) + (stats['N.G. Condition'] || 0) + (stats['Broken'] || 0);
+
+        // Update Top Stats Text
         const statTotal = document.getElementById('stat-total-assets');
         if (statTotal) statTotal.textContent = total;
 
@@ -88,6 +93,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const statGood = document.getElementById('stat-good');
         if (statGood) statGood.textContent = goodCount;
+
+        const statNG = document.getElementById('stat-ng');
+        if (statNG) statNG.textContent = ngCount;
 
 
         // 1. New Inventories (Recent Activity)
@@ -116,7 +124,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (usersList) {
             usersList.innerHTML = '';
             if (data.newUsers && data.newUsers.length > 0) {
-                if (usersCard) usersCard.style.display = 'block'; // Block for content-card style
+                if (usersCard) usersCard.style.display = 'block';
 
                 data.newUsers.forEach(user => {
                     const li = document.createElement('li');
@@ -153,28 +161,15 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         // 4. Chart Statistics
-        renderChart(data, goodCount, attentionCount, total);
+        renderChart(data, goodCount, attentionCount, ngCount, total);
     }
 
-    function renderChart(data, goodCount, attentionCount, total) {
-        // Recalculate or pass from above (passing is more efficient)
-        // Note: In renderChart logic, attention vs NG was separated for colors. 
-        // For the top card we grouped them. 
-        // Let's re-separate for chart to keep the 3-color scheme if desired, or skip.
-        // The original chart had 3 colors: Green, Yellow, Red.
-
-        const stats = data.stats || {};
-        // Re-calculate strictly for chart segments
-        const pureGood = (stats['GOOD'] || 0) + (stats['Good Condition'] || 0);
-        const pureAttention = (stats['NEEDS ATTENTION'] || 0) + (stats['Needs Attention Condition'] || 0) + (stats['Needs Repair'] || 0);
-        const pureNG = (stats['N.G'] || 0) + (stats['N.G. Condition'] || 0) + (stats['Broken'] || 0);
-
+    function renderChart(data, goodCount, attentionCount, ngCount, total) {
         // Safety for div
         const safeTotal = total > 0 ? total : 1;
 
-        const p1 = (pureGood / safeTotal) * 100;
-        // p2 needs to be accumulation of Good + Attention
-        const p2 = p1 + ((pureAttention / safeTotal) * 100);
+        const p1 = (goodCount / safeTotal) * 100;
+        const p2 = p1 + ((attentionCount / safeTotal) * 100);
 
         // Update Total Label
         const totalLabel = document.getElementById('chart-total-label');
@@ -199,17 +194,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
                 <div class="legend-item">
                     <div style="display:flex; align-items:center;">
-                        <span class="legend-color bg-yellow" style="background:#F59E0B"></span>
+                        <span class="legend-color bg-yellow-100" style="background:#F59E0B"></span>
                         <span class="text-dark">Attention</span>
                     </div>
-                    <span class="font-medium text-dark">${Math.round((pureAttention / safeTotal) * 100)}%</span>
+                    <span class="font-medium text-dark">${Math.round((attentionCount / safeTotal) * 100)}%</span>
                 </div>
                 <div class="legend-item">
                     <div style="display:flex; align-items:center;">
-                        <span class="legend-color bg-red" style="background:#EF4444"></span>
-                        <span class="text-dark">Critical</span>
+                        <span class="legend-color bg-red-100" style="background:#EF4444"></span>
+                        <span class="text-dark">Not Good / Broken</span>
                     </div>
-                    <span class="font-medium text-dark">${Math.round((pureNG / safeTotal) * 100)}%</span>
+                    <span class="font-medium text-dark">${Math.round((ngCount / safeTotal) * 100)}%</span>
                 </div>
             `;
         }
