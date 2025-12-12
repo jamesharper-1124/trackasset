@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Auth Check
     if (!token) {
-        window.location.href = '/login?error=session_expired';
+        window.location.href = 'login.html?error=session_expired';
         return;
     }
 
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Using jQuery AJAX to leverage global auth-guard setup
         $.ajax({
-            url: '/api/inventories/data?t=' + new Date().getTime(),
+            url: CONFIG.apiUrl('/api/inventories/data?t=' + new Date().getTime()),
             method: 'GET',
             success: function (data) {
                 if (data) {
@@ -104,7 +104,18 @@ document.addEventListener('DOMContentLoaded', function () {
         div.dataset.room = (item.room ? item.room.room_name : '').toLowerCase();
         div.dataset.condition = (item.status_condition || '').toLowerCase();
 
-        const photoUrl = item.inventory_photo ? `/${item.inventory_photo}` : '/images/inventory/default.png';
+        let photoUrl = item.inventory_photo || 'images/inventory/default.png';
+        if (!photoUrl.startsWith('http')) {
+            const path = photoUrl.startsWith('/') ? photoUrl.substring(1) : photoUrl;
+            if (path.includes('storage')) {
+                photoUrl = CONFIG.apiUrl('/' + path);
+            } else if (path.startsWith('images/')) {
+                photoUrl = CONFIG.apiUrl('/' + path);
+            } else {
+                photoUrl = CONFIG.apiUrl('/storage/' + path);
+            }
+        }
+
         const roomName = item.room ? item.room.room_name : 'Unassigned';
 
         let statusClass = 'status-good';
@@ -114,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let actionsHtml = '';
         if (canEdit) {
             actionsHtml = `
-                <a href="/inventories/${item.id}/edit" class="btn-icon-action edit" title="Edit">
+                <a href="edit_inventory.html?id=${item.id}" class="btn-icon-action edit" title="Edit">
                     <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                     </svg>
@@ -216,7 +227,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!token) {
             alert('Session Expired. Please log in again.');
             localStorage.removeItem('auth_token');
-            window.location.href = '/login';
+            window.location.href = 'login.html';
             return;
         }
 
@@ -224,7 +235,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!confirm('Are you sure you want to delete this inventory?')) return;
 
         $.ajax({
-            url: '/api/inventories/' + id,
+            url: CONFIG.apiUrl('/api/inventories/' + id),
             method: 'DELETE',
             success: function (response) {
                 fetchInventoriesData(); // Refresh list
