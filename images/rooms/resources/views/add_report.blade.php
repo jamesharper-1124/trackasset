@@ -1,0 +1,292 @@
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Add Report - TrackAsset</title>
+        <!-- Link to custom CSS -->
+        <link rel="stylesheet" href="{{ asset('css/inventories.css') }}?v={{ time() }}">
+        <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}?v={{ time() }}">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="{{ asset('js/dashboard.js') }}?v={{ time() }}"></script>
+        <script src="{{ asset('js/auth-guard.js') }}?v={{ time() }}"></script>
+        <style>
+            /* Specific styles for Add Report */
+            .item-preview-container {
+                display: flex;
+                align-items: center;
+                gap: 1.5rem;
+                margin-bottom: 1.5rem;
+                padding: 1rem;
+                background-color: #f9fafb;
+                border-radius: 0.5rem;
+                border: 1px solid #e5e7eb;
+            }
+
+            .item-preview-img {
+                width: 80px;
+                height: 80px;
+                object-fit: cover;
+                border-radius: 0.375rem;
+                background-color: #e5e7eb;
+            }
+
+            .item-preview-details h4 {
+                font-size: 1rem;
+                font-weight: 600;
+                color: #1f2937;
+                margin: 0 0 0.25rem 0;
+            }
+
+            .item-preview-details p {
+                font-size: 0.875rem;
+                color: #6b7280;
+                margin: 0;
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <div class="app-container">
+
+            <!-- Sidebar -->
+            <aside id="sidebar" class="sidebar">
+                <div class="sidebar-header">
+                    <span class="brand-text">TrackAsset</span>
+                </div>
+                <nav class="sidebar-nav">
+                    <a href="{{ route('dashboard') }}" class="nav-link">
+                        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
+                            </path>
+                        </svg>
+                        Dashboard
+                    </a>
+                    <a href="{{ route('inventories') }}" class="nav-link">
+                        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01">
+                            </path>
+                        </svg>
+                        Inventories
+                    </a>
+                    <a href="{{ route('reports') }}" class="nav-link active">
+                        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 00-2 2v12a2 2 0 002 2h5l-4 4 4-4H9a2 2 0 00-2-2">
+                            </path>
+                        </svg>
+                        Reports
+                    </a>
+                    <a href="{{ route('rooms') }}" class="nav-link">
+                        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                            </path>
+                        </svg>
+                        Rooms
+                    </a>
+                    @if(Auth::user()->role === 'admin')
+                        <a href="{{ route('users') }}" class="nav-link">
+                            <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
+                                </path>
+                            </svg>
+                            Users
+                        </a>
+                    @endif
+                </nav>
+            </aside>
+            <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+            <div class="main-wrapper">
+                <header class="top-header">
+                    <div class="header-left">
+                        <button id="sidebar-toggle" class="sidebar-toggle">
+                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 6h16M4 12h16M4 18h16"></path>
+                            </svg>
+                        </button>
+                        <h2 class="page-title">Add Report</h2>
+                    </div>
+                    <!-- Right: User Profile -->
+                    <div class="header-right">
+                        <div class="user-profile">
+                            <img src="{{ asset(Auth::user()->profile_photo) }}" alt="Profile" class="profile-img">
+                            <span class="user-name">{{ Auth::user()->firstname }}</span>
+                        </div>
+
+                        <!-- Cog Dropdown -->
+                        <div style="position: relative;">
+                            <button id="dropdown-btn" style="background:none; border:none; cursor:pointer; color:#4b5563;">
+                                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                                    </path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                            </button>
+                            <!-- Dropdown Menu -->
+                            <div id="dropdown-menu"
+                                style="display:none; position:absolute; right:0; margin-top:0.5rem; width:12rem; background:white; border-radius:0.375rem; box-shadow:0 10px 15px -3px rgba(0,0,0,0.1); padding:0.25rem 0; z-index:50;">
+                                <a href="{{ route('settings') }}"
+                                    style="display:block; padding:0.5rem 1rem; font-size:0.875rem; color:#374151; text-decoration:none;">Settings</a>
+                                <form action="{{ route('logout') }}" method="POST">
+                                    @csrf
+                                    <button id="logout-btn" type="submit"
+                                        style="display:block; width:100%; text-align:left; padding:0.5rem 1rem; font-size:0.875rem; color:#dc2626; background:none; border:none; cursor:pointer;">Logout</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <main class="content-area">
+                    <div class="form-container">
+                        <h3 class="form-title">Create New Report</h3>
+
+                        @if ($errors->any())
+                            <div
+                                style="background-color: #fee2e2; border: 1px solid #ef4444; color: #b91c1c; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">
+                                <ul style="margin: 0; padding-left: 1.5rem;">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
+                        <form id="add-report-form" action="{{ route('reports.store') }}" method="POST"
+                            enctype="multipart/form-data">
+                            @csrf
+                            <div class="form-grid">
+
+                                <!-- Item Search -->
+                                <div style="grid-column: 1 / -1;">
+                                    <label class="form-label">Inventory Name</label>
+                                    <div style="position: relative;">
+                                        <input type="text" id="inventory-search" name="inventory_name" class="form-input"
+                                            placeholder="Type to search (e.g. RJ45)..." autocomplete="off" required
+                                            data-search-url="{{ route('ajax.inventories.search') }}">
+                                        <input type="hidden" name="inventory_id" id="inventory-id" required>
+
+                                        <!-- Search Results Dropdown -->
+                                        <div id="search-results"
+                                            style="display:none; position:absolute; top:100%; left:0; right:0; background:white; border:1px solid #e5e7eb; border-radius:0.5rem; max-height:200px; overflow-y:auto; z-index:50; box-shadow:0 4px 6px -1px rgba(0,0,0,0.1);">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Selected Item Preview -->
+                                <div id="item-preview" class="item-preview-container"
+                                    style="display: none; grid-column: 1 / -1; align-items: flex-start;">
+                                    <img id="preview-img" src="" alt="Inventory" class="item-preview-img">
+                                    <div class="item-preview-details">
+                                        <h4 id="preview-name" style="margin-bottom: 0.25rem;">Inventory Name</h4>
+                                        <p id="preview-room" style="font-size: 0.85rem; color: #4b5563;">Room: </p>
+                                        <span id="preview-status" class="card-status status-good"
+                                            style="margin-top: 0.5rem; display:inline-block;">GOOD</span>
+                                    </div>
+                                </div>
+
+
+
+                                <!-- Reason / Remarks -->
+                                <div style="grid-column: 1 / -1;">
+                                    <label class="form-label">Reason / Remarks</label>
+                                    <textarea name="remarks" class="form-input" rows="4"
+                                        placeholder="Describe the issue or reason for reporting..." required></textarea>
+                                </div>
+
+                                <!-- Evidence Photo -->
+                                <div style="grid-column: 1 / -1;">
+                                    <label class="form-label">Evidence</label>
+                                    <div id="evidence-wrapper" class="image-upload-wrapper">
+                                        <img id="evidence-preview-img" src="{{ asset('images/reports/default.png') }}"
+                                            alt="Preview" class="image-preview">
+                                        <div class="upload-placeholder">
+                                            <svg class="upload-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z">
+                                                </path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                            </svg>
+                                            <span class="upload-text">Change Image</span>
+                                        </div>
+                                        <!-- Removed accept="image/*" to match add_inventory.blade.php exactly -->
+                                        <input id="evidence-file-input" type="file" name="evidence_photo"
+                                            class="file-input-hidden">
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="form-actions">
+                                <a href="{{ route('reports') }}" class="btn-cancel">Cancel</a>
+                                <button type="submit" class="btn-submit">Submit Report</button>
+                            </div>
+                        </form>
+                    </div>
+                </main>
+            </div>
+        </div>
+
+        <script src="{{ asset('js/add_report.js') }}?v={{ time() }}"></script>
+        <script>
+            // Evidence Preview Script (With Debugging)
+            const evidenceInput = document.getElementById('evidence-file-input');
+            const evidenceWrapper = document.getElementById('evidence-wrapper');
+            const evidencePreview = document.getElementById('evidence-preview-img');
+
+            if (evidenceWrapper && evidenceInput) {
+                // Prevent recursive clicks if input is inside wrapper
+                evidenceWrapper.addEventListener('click', (e) => {
+                    if (e.target !== evidenceInput) {
+                        evidenceInput.click();
+                    }
+                });
+
+                evidenceInput.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Stop bubbling to wrapper
+                });
+
+                evidenceInput.addEventListener('change', function () {
+                    // Debug Alert
+                    // alert('File Input Changed'); 
+
+                    const file = this.files[0];
+                    if (file) {
+                        // alert('File Selected: ' + file.name + ' (' + file.size + ' bytes)');
+
+                        // Size validation (10MB)
+                        if (file.size > 10 * 1024 * 1024) {
+                            alert('File too large (Max 10MB)');
+                            this.value = '';
+                            return;
+                        }
+
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            // alert('FileReader Loaded');
+                            evidencePreview.src = e.target.result;
+                        }
+                        reader.onerror = function () {
+                            alert('Error reading file (FileReader error)');
+                        }
+                        reader.readAsDataURL(file);
+                    } else {
+                        // alert('No file selected in event');
+                    }
+                });
+            }
+        </script>
+    </body>
+
+    </html>

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Reports - TrackAsset</title>
+    <!-- Link to custom CSS -->
+    <!-- Link to custom CSS -->
+    <link rel="stylesheet" href="{{ asset('css/reports.css') }}?v={{ time() }}">
+    <!-- dashboard.css is now bundled into reports.css for reliability -->
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{{ asset('js/auth-guard.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/dashboard.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/reports.js') }}?v={{ time() }}"></script>
+</head>
+
+<body>
+
+    <div class="app-container">
+
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <span class="brand-text">TrackAsset</span>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="{{ route('dashboard') }}" class="nav-link">
+                    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
+                        </path>
+                    </svg>
+                    Dashboard
+                </a>
+                <a href="{{ route('inventories') }}" class="nav-link">
+                    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01">
+                        </path>
+                    </svg>
+                    Inventories
+                </a>
+                <a href="{{ route('reports') }}" class="nav-link active">
+                    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 00-2 2v12a2 2 0 002 2h5l-4 4 4-4H9a2 2 0 00-2-2">
+                        </path>
+                    </svg>
+                    Reports
+                </a>
+                <a href="{{ route('rooms') }}" class="nav-link">
+                    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                        </path>
+                    </svg>
+                    Rooms
+                </a>
+                @if(Auth::user()->role === 'admin')
+                    <a href="{{ route('users') }}" class="nav-link">
+                        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
+                            </path>
+                        </svg>
+                        Users
+                    </a>
+                @endif
+            </nav>
+        </aside>
+
+        <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+        <div class="main-wrapper">
+            <header class="top-header">
+                <div class="header-left">
+                    <button id="sidebar-toggle" class="sidebar-toggle">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                    <h2 class="page-title">Reports</h2>
+                </div>
+                <div class="header-right">
+                    <div class="user-profile">
+                        <img src="{{ asset(Auth::user()->profile_photo) }}" alt="Profile" class="profile-img">
+                        <span class="user-name">{{ Auth::user()->firstname }}</span>
+                    </div>
+
+                    <!-- Cog Dropdown -->
+                    <div style="position: relative;">
+                        <button id="dropdown-btn" style="background:none; border:none; cursor:pointer; color:#4b5563;">
+                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                                </path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                        </button>
+                        <!-- Dropdown Menu -->
+                        <div id="dropdown-menu"
+                            style="display:none; position:absolute; right:0; margin-top:0.5rem; width:12rem; background:white; border-radius:0.375rem; box-shadow:0 10px 15px -3px rgba(0,0,0,0.1); padding:0.25rem 0; z-index:50;">
+                            <a href="{{ route('settings') }}"
+                                style="display:block; padding:0.5rem 1rem; font-size:0.875rem; color:#374151; text-decoration:none;">Settings</a>
+                            <form action="{{ route('logout') }}" method="POST">
+                                @csrf
+                                <button id="logout-btn" type="submit"
+                                    style="display:block; width:100%; text-align:left; padding:0.5rem 1rem; font-size:0.875rem; color:#dc2626; background:none; border:none; cursor:pointer;">Logout</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <main class="content-area">
+                <!-- Controls Bar -->
+                <div class="controls-bar">
+                    <div class="search-wrapper">
+                        <span class="search-icon">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </span>
+                        <input type="text" id="reports-search" class="search-input" placeholder="Search reports...">
+                    </div>
+
+                    <div class="action-buttons">
+                        <!-- Delete Multiple Button Group -->
+                        <!-- Delete Selected Button (Appears when items selected) -->
+                        <button id="btn-delete-selected" class="btn btn-danger" style="display: none;">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                style="margin-right: 4px;">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                </path>
+                            </svg>
+                            <span class="btn-text">Delete Selected (<span id="selected-count">0</span>)</span>
+                        </button>
+
+                        <a href="{{ route('reports.create') }}" class="btn btn-primary btn-icon-only">
+                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4v16m8-8H4"></path>
+                            </svg>
+                            <!-- Hidden span for accessibility/fallback if needed, but css hides it -->
+                            <span>Creation</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Unified Reports Grid -->
+                <!-- Two Column Layout: My Submitted (Left) | Available (Right) -->
+                <div class="reports-dashboard-grid" id="reports-grid">
+
+                    <!-- 1. My Submitted Reports -->
+                    <div id="submitted-reports-section">
+                        <div class="section-title" onclick="toggleSection('submitted-reports-container', this)"
+                            style="cursor: pointer; justify-content: space-between;">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                My Submitted Reports
+                                <span class="section-count" id="submitted-count">0</span>
+                            </div>
+                            <svg class="chevron-icon" width="20" height="20" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24" style="transition: transform 0.2s;">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                        <div id="submitted-reports-container" class="reports-column">
+                            <p class="empty-state">No reports submitted yet.</p>
+                        </div>
+                    </div>
+
+                    <!-- 2. Received / Available Reports -->
+                    <div id="received-reports-section">
+                        <div class="section-title" onclick="toggleSection('received-reports-container', this)"
+                            style="cursor: pointer; justify-content: space-between;">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                Available Reports
+                                <span class="section-count" id="received-count">0</span>
+                            </div>
+                            <svg class="chevron-icon" width="20" height="20" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24" style="transition: transform 0.2s;">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                        <div id="received-reports-container" class="reports-column">
+                            <p class="empty-state">No reports available.</p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </main>
+
+            <!-- REPORT DETAILS MODAL -->
+            <div id="report-modal" class="modal-overlay">
+                <div class="modal-container">
+                    <button class="modal-close" id="modal-close-btn">&times;</button>
+                    <h3 class="modal-title" id="modal-title">Report Details</h3>
+
+                    <!-- View Mode -->
+                    <div id="modal-view-mode">
+                        <div class="modal-image-wrapper">
+                            <img id="modal-img" src="" alt="Report Image" style="display:none;">
+                        </div>
+                        <div class="modal-field">
+                            <label>Inventory Name</label>
+                            <div id="modal-inventory-name" class="field-value"></div>
+                        </div>
+                        <div class="modal-field">
+                            <label>Reported Issue</label>
+                            <div id="modal-remarks" class="field-value"></div>
+                        </div>
+                        <div class="modal-field">
+                            <label>Status Condition</label>
+                            <div id="modal-status" class="field-value"></div>
+                        </div>
+                        <div class="modal-field">
+                            <label>Date Reported</label>
+                            <div id="modal-date" class="field-value"></div>
+                        </div>
+                        <div class="modal-actions" id="modal-actions-submitted" style="display: none;">
+                            <button id="btn-delete-report" class="btn-danger">Delete</button>
+                        </div>
+                    </div>
+
+                    <!-- Edit Mode (Form) -->
+                    <form id="modal-edit-form" method="POST" enctype="multipart/form-data" style="display: none;">
+                        @csrf
+                        @method('PUT')
+                        <!-- Hidden inputs injected by JS -->
+                        <div class="modal-field">
+                            <label>Inventory Name</label>
+                            <input type="text" id="edit-inventory-name" class="form-input" disabled>
+                        </div>
+                        <div class="modal-field">
+                            <label>Reported Issue</label>
+                            <textarea name="remarks" id="edit-remarks" class="form-input" rows="4" required></textarea>
+                        </div>
+                        <div class="modal-field">
+                            <label>Update Evidence (Optional)</label>
+                            <input type="file" name="evidence_photo" class="form-input">
+                        </div>
+                        <div class="modal-actions">
+                            <button type="button" id="btn-cancel-edit" class="btn-secondary">Cancel</button>
+                            <button type="submit" class="btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
