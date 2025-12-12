@@ -208,12 +208,15 @@ document.addEventListener('DOMContentLoaded', function () {
             } else if (path.includes('storage')) {
                 photoUrl = CONFIG.apiUrl('/' + path);
             } else if (path.startsWith('images/')) {
-                // public_path upload means direct access
-                photoUrl = CONFIG.apiUrl('/' + path);
+                // Special handling: default.png is in public root, others are in storage
+                if (path.includes('default.png')) {
+                    photoUrl = CONFIG.apiUrl('/' + path);
+                } else {
+                    photoUrl = CONFIG.apiUrl('/storage/' + path);
+                }
             } else {
                 photoUrl = CONFIG.apiUrl('/storage/' + path);
             }
-            console.log(`[DEBUG] Room: ${room.room_name}, Raw Path: ${room.room_photo}, Final URL: ${photoUrl}`);
         } else {
             photoUrl = CONFIG.apiUrl('/images/rooms/default.png');
         }
