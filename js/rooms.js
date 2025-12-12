@@ -194,19 +194,28 @@ document.addEventListener('DOMContentLoaded', function () {
         // Room Photo
         let photoUrl = room.room_photo;
         if (photoUrl) {
-            if (photoUrl.startsWith('http')) {
-                // If it's already a full URL, use it
-            } else {
-                // Determine if we need to prepend storage or not
-                const path = photoUrl.startsWith('/') ? photoUrl : '/' + photoUrl;
+            // Remove leading slash for cleaner handling
+            let path = photoUrl.startsWith('/') ? photoUrl.substring(1) : photoUrl;
 
-                // If the path already includes 'storage' or 'images', presume it's relative to root/public
-                // Otherwise, default to storage
-                if (path.includes('/storage') || path.includes('/images')) {
-                    photoUrl = CONFIG.apiUrl(path);
+            // Logic:
+            // 1. If it starts with 'http', use as is.
+            // 2. If it contains 'storage', assume it's a storage path.
+            // 3. If it starts with 'images/', assume it's a public asset.
+            // 4. Otherwise, assume it needs '/storage/' prepended (Laravel default).
+
+            if (path.startsWith('http')) {
+                photoUrl = path;
+            } else if (path.includes('storage')) {
+                photoUrl = CONFIG.apiUrl('/' + path);
+            } else if (path.startsWith('images/')) {
+                // Special handling: default.png is in public root, others are in storage
+                if (path.includes('default.png')) {
+                    photoUrl = CONFIG.apiUrl('/' + path);
                 } else {
-                    photoUrl = CONFIG.apiUrl('/storage' + path);
+                    photoUrl = CONFIG.apiUrl('/storage/' + path);
                 }
+            } else {
+                photoUrl = CONFIG.apiUrl('/storage/' + path);
             }
         } else {
             photoUrl = CONFIG.apiUrl('/images/rooms/default.png');
@@ -215,7 +224,7 @@ document.addEventListener('DOMContentLoaded', function () {
         div.innerHTML = `
                 <div class="card-img-wrapper">
                     ${adminCheckbox}
-                    <img src="${photoUrl}" alt="${room.room_name}" class="card-img" onerror="this.onerror=null; this.src='images/rooms/default.png'">
+                    <img src="${photoUrl}" alt="${room.room_name}" class="card-img" onerror="this.onerror=null; this.src='${CONFIG.apiUrl('/images/rooms/default.png')}';">
                 </div>
                 <div class="card-content">
                     <h3 class="card-title">${room.room_name}</h3>
