@@ -335,6 +335,78 @@ body {
     color: #16a34a;
 }
 
+.bg-yellow-100 {
+    background-color: #fef9c3;
+}
+
+.text-yellow-600 {
+    color: #ca8a04;
+}
+
+/* Mobile Optimization (350px support) */
+@media (max-width: 480px) {
+    .hide-on-mobile {
+        display: none !important;
+    }
+
+    .page-title {
+        font-size: 1.1rem;
+    }
+
+    /* Slightly smaller */
+    .user-name {
+        display: none;
+    }
+
+    /* Hide name on very small screens to save space */
+    .top-header {
+        padding: 0 0.75rem;
+    }
+
+    /* Stats Grid 2 columns on mobile (compressed) */
+    .stats-overview {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+    }
+
+    /* Adjust padding for tiny screens */
+    .content-area {
+        padding: 0.75rem;
+    }
+
+    /* Mini Stats Compact */
+    .mini-stat-card {
+        padding: 0.75rem;
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+    }
+
+    .stat-icon {
+        width: 28px;
+        height: 28px;
+        margin-right: 0;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-icon svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    .stat-value {
+        font-size: 1.1rem;
+    }
+
+    .stat-label {
+        font-size: 0.65rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+    }
+}
+
 /* Split Layout */
 .dashboard-split {
     display: grid;
