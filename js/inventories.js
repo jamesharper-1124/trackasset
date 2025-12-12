@@ -46,8 +46,19 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!assignedContainer && !availableContainer) return;
 
         const { userInventories, availableInventories, currentUser } = data;
+
+        console.log('[DEBUG] renderInventories data:', data);
+
+        // Safety checks for currentUser
+        if (!currentUser) {
+            console.error('[ERROR] currentUser is missing from API response!');
+            return;
+        }
+
         const isAdmin = (currentUser.role === 'admin');
         const isUser = (currentUser.role === 'user');
+
+        console.log('[DEBUG] Role:', currentUser.role, 'isAdmin:', isAdmin, 'isUser:', isUser);
 
         // Show "Add Inventory" button if not a basic user
         const addBtn = document.getElementById('add-inventory-btn');
