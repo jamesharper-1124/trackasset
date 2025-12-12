@@ -194,17 +194,28 @@ document.addEventListener('DOMContentLoaded', function () {
         // Room Photo
         let photoUrl = room.room_photo;
         if (photoUrl) {
-            const path = photoUrl.startsWith('/') ? photoUrl : '/' + photoUrl;
-            const storagePath = path.includes('storage') ? path : '/storage' + path;
-            photoUrl = CONFIG.apiUrl(storagePath);
+            if (photoUrl.startsWith('http')) {
+                // If it's already a full URL, use it
+            } else {
+                // Determine if we need to prepend storage or not
+                const path = photoUrl.startsWith('/') ? photoUrl : '/' + photoUrl;
+
+                // If the path already includes 'storage' or 'images', presume it's relative to root/public
+                // Otherwise, default to storage
+                if (path.includes('/storage') || path.includes('/images')) {
+                    photoUrl = CONFIG.apiUrl(path);
+                } else {
+                    photoUrl = CONFIG.apiUrl('/storage' + path);
+                }
+            }
         } else {
-            photoUrl = CONFIG.apiUrl('/images/rooms/default.png'); // Fallback logic needs verification on server
+            photoUrl = CONFIG.apiUrl('/images/rooms/default.png');
         }
 
         div.innerHTML = `
                 <div class="card-img-wrapper">
                     ${adminCheckbox}
-                    <img src="${photoUrl}" alt="${room.room_name}" class="card-img" onerror="this.src='${CONFIG.apiUrl('/images/rooms/default.png')}'">
+                    <img src="${photoUrl}" alt="${room.room_name}" class="card-img" onerror="this.onerror=null; this.src='images/rooms/default.png'">
                 </div>
                 <div class="card-content">
                     <h3 class="card-title">${room.room_name}</h3>
