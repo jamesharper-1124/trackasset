@@ -654,27 +654,31 @@ body {
     /* We use a single flex container. .action-buttons uses display: contents to let its children participate directly. */
     /* 1. Header Controls: Search | Delete | Plus */
     /* We use a single flex container. .action-buttons uses display: contents to let its children participate directly. */
+    /* 1. Header Controls: Search | Delete | Plus */
+    /* Safer Flexbox approach (No display: contents) */
     .controls-bar {
-        display: flex;
-        flex-direction: row;
+        display: flex !important;
+        flex-direction: row !important;
+        /* Force Horizontal */
         align-items: center;
         gap: 8px;
-        /* Slightly more gap */
-        flex-wrap: nowrap;
+        flex-wrap: nowrap !important;
         width: 100%;
     }
 
     .search-wrapper {
-        flex: 1 1 50px;
+        flex: 1;
+        /* Take remaining space */
+        min-width: 0;
         /* Allow shrinking */
-        min-width: 50px;
-        /* Go small if needed */
+        max-width: none;
     }
 
     .search-input {
-        padding: 10px 10px 10px 36px;
-        /* Reduce padding */
+        padding: 8px 10px 8px 36px;
         font-size: 0.9rem;
+        height: 40px;
+        /* Match button height */
     }
 
     .search-icon {
@@ -683,117 +687,76 @@ body {
         height: 16px;
     }
 
+    /* Container for buttons */
     .action-buttons {
-        display: contents;
-        /* UNWRAP: Children become flex items of .controls-bar */
-    }
-
-    /* Order: Search (1) -> Delete (2) -> Plus (3) */
-    .search-wrapper {
-        order: 1;
-        flex: 1 1 auto;
-        /* Grow and shrink */
-        min-width: 0;
-        /* Allow shrinking below content size */
-    }
-
-    /* Delete Button - Only visible when needed */
-    #btn-delete-selected {
-        flex: 0 0 auto;
-        white-space: nowrap;
-        font-size: 0.75rem;
-        padding: 8px 10px;
-        order: 2;
-        border-radius: 8px;
-        background: #ef4444;
-        color: white;
-        border: none;
-        box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
+        display: flex;
+        gap: 8px;
+        flex-shrink: 0;
+        /* Don't shrink */
+        align-items: center;
+        width: auto;
+        /* Auto width */
     }
 
     /* Add Button (+) */
     .btn-primary.btn-icon-only {
-        flex: 0 0 40px;
-        /* Fixed 40px width */
-        width: 40px;
-        /* Fixed 40px width */
-        height: 40px;
-        /* Fixed 40px height */
-        order: 3;
+        width: 40px !important;
+        height: 40px !important;
+        flex: 0 0 40px !important;
         border-radius: 50%;
-        box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
         padding: 0;
-        /* Important to center icon */
-        display: flex;
+        display: inline-flex;
         align-items: center;
         justify-content: center;
     }
 
-    /* Make delete button icon-only on very small screens if needed, 
-       but user asked for "Delete Selected" button. 
-       We will prioritize keeping it visible but allowing search to shrink. 
-    */
-    .btn-danger {
-        padding: 8px 12px;
-        font-size: 0.85rem;
+    /* Delete Button */
+    #btn-delete-selected {
+        font-size: 0.75rem;
+        padding: 0 10px;
+        height: 40px;
+        /* Match height */
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
     }
 
-    /* Hide text on very small screens? No, user wants the button. */
-    #btn-delete-selected .btn-text {
-        display: inline;
-    }
-
-    /* On EXTREMELY small screens (like 320px), we might want to hide the text 'Selected' */
+    /* On very small screens, hide "Delete Selected" text, just show icon? */
     @media (max-width: 360px) {
+        #btn-delete-selected span.btn-text {
+            display: none;
+        }
+
         #btn-delete-selected {
-            padding: 8px;
+            width: 40px;
+            padding: 0;
+            justify-content: center;
         }
 
-        #btn-delete-selected .btn-text {
-            display: none;
+        #btn-delete-selected svg {
+            margin-right: 0 !important;
         }
-
-        #btn-delete-selected::after {
-            content: 'Delete';
-            display: inline;
-        }
-
-        /* Actually simpler: just hide the span and show icon? 
-           User code I added SVG icon. */
-
-        #btn-delete-selected .btn-text {
-            display: none;
-        }
-    }
-
-    .reports-column {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        /* 2 Columns strict */
-        gap: 10px;
     }
 
     /* 3. Card Styling (Vertical) */
     .report-card-body {
         flex-direction: column;
-        /* Image Top */
         padding: 0;
-        /* Tight padding */
     }
 
     .report-card-image-wrapper {
         width: 100%;
-        height: 100px;
-        /* Fixed height image */
+        height: 120px;
+        /* Slightly taller for cover */
         border-radius: 12px 12px 0 0;
-        /* Top rounded only */
         margin: 0;
     }
 
     .report-card-content {
-        padding: 8px;
-        gap: 4px;
+        padding: 12px;
+        gap: 6px;
     }
+
 
     .report-inv-name {
         font-size: 0.85rem;
