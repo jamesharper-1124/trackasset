@@ -14,14 +14,18 @@ document.addEventListener('DOMContentLoaded', function () {
     // Sidebar Toggle
     if (sidebarToggle) {
         sidebarToggle.addEventListener('click', function () {
+            console.log('Dashboard: Sidebar Toggle Clicked');
             sidebar.classList.toggle('show');
             sidebarOverlay.classList.toggle('show');
         });
+    } else {
+        console.warn('Dashboard: Sidebar Toggle Not Found');
     }
 
     // Close Sidebar on Overlay Click
     if (sidebarOverlay) {
         sidebarOverlay.addEventListener('click', function () {
+            console.log('Dashboard: Sidebar Overlay Clicked');
             sidebar.classList.remove('show');
             sidebarOverlay.classList.remove('show');
         });
@@ -30,6 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Dropdown Toggle
     if (dropdownBtn && dropdownMenu) {
         dropdownBtn.addEventListener('click', function (e) {
+            console.log('Dashboard: Dropdown Clicked');
             e.stopPropagation();
             dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
         });
@@ -40,6 +45,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 dropdownMenu.style.display = 'none';
             }
         });
+    } else {
+        if (!dropdownBtn) console.warn('Dashboard: Dropdown Button Not Found');
+        if (!dropdownMenu) console.warn('Dashboard: Dropdown Menu Not Found');
     }
 
     // --------------------------------------------------------------------------
