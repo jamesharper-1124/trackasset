@@ -232,49 +232,52 @@
                 </div>
             </main>
         </div>
-    </div>
+        <div class="app-container">
+            <!-- Sidebar and Content structure -->
+        </div>
 
-    <script src="js/add_report.js?v=6"></script>
-    <script>
-        // Evidence Preview Script (With Debugging)
-        const evidenceInput = document.getElementById('evidence-file-input');
-        const evidenceWrapper = document.getElementById('evidence-wrapper');
-        const evidencePreview = document.getElementById('evidence-preview-img');
+        <!-- Scripts -->
+        <script src="js/add_report.js?v=7"></script>
+        <script>
+            // Evidence Preview Script (With Debugging)
+            const evidenceInput = document.getElementById('evidence-file-input');
+            const evidenceWrapper = document.getElementById('evidence-wrapper');
+            const evidencePreview = document.getElementById('evidence-preview-img');
 
-        if (evidenceWrapper && evidenceInput) {
-            // Prevent recursive clicks if input is inside wrapper
-            evidenceWrapper.addEventListener('click', (e) => {
-                if (e.target !== evidenceInput) {
-                    evidenceInput.click();
-                }
-            });
-
-            evidenceInput.addEventListener('click', (e) => {
-                e.stopPropagation(); // Stop bubbling to wrapper
-            });
-
-            evidenceInput.addEventListener('change', function () {
-                const file = this.files[0];
-                if (file) {
-                    // Size validation (10MB)
-                    if (file.size > 10 * 1024 * 1024) {
-                        alert('File too large (Max 10MB)');
-                        this.value = '';
-                        return;
+            if (evidenceWrapper && evidenceInput) {
+                // Prevent recursive clicks if input is inside wrapper
+                evidenceWrapper.addEventListener('click', (e) => {
+                    if (e.target !== evidenceInput) {
+                        evidenceInput.click();
                     }
+                });
 
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        evidencePreview.src = e.target.result;
+                evidenceInput.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Stop bubbling to wrapper
+                });
+
+                evidenceInput.addEventListener('change', function () {
+                    const file = this.files[0];
+                    if (file) {
+                        // Size validation (10MB)
+                        if (file.size > 10 * 1024 * 1024) {
+                            alert('File too large (Max 10MB)');
+                            this.value = '';
+                            return;
+                        }
+
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            evidencePreview.src = e.target.result;
+                        }
+                        reader.onerror = function () {
+                            alert('Error reading file (FileReader error)');
+                        }
+                        reader.readAsDataURL(file);
                     }
-                    reader.onerror = function () {
-                        alert('Error reading file (FileReader error)');
-                    }
-                    reader.readAsDataURL(file);
-                }
-            });
-        }
-    </script>
+                });
+            }
+        </script>
 </body>
 
 </html>
