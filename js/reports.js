@@ -269,10 +269,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (r.evidence_photo) {
             let src = r.evidence_photo;
+            console.log('DEBUG: Original photo path:', src); // Debug log
             if (!src.startsWith('http')) {
                 const path = src.startsWith('/') ? src : `/${src}`;
                 src = CONFIG.apiUrl(path);
             }
+            console.log('DEBUG: Final modal image src:', src); // Debug log
             mImg.src = src;
             mImg.style.display = 'block';
         } else {
