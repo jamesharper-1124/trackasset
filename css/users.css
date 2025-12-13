@@ -1,223 +1,116 @@
-/* --- LAYOUT GRID --- */
-.users-grid {
-    display: grid;
-    /* Responsive grid: min 300px width cards */
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 1.5rem;
-    padding: 1rem 0;
-}
+/* --- UNIVERSAL BUTTON SIZING --- */
+/* Makes buttons chunky and easy to hit on both Desktop & Mobile */
 
-/* --- CONTROLS BAR (Top Area) --- */
-.controls-bar {
-    display: flex;
-    flex-wrap: wrap; /* Allows wrapping on mobile */
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 2rem;
-}
-
-.action-buttons {
-    display: flex;
-    gap: 1rem;
-}
-
-.search-wrapper {
-    position: relative;
-    flex-grow: 1;
-    max-width: 400px; /* Prevent search from getting too wide */
-}
-
-.search-input {
-    width: 100%;
-    padding: 0.6rem 1rem 0.6rem 2.5rem;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.5rem;
-    outline: none;
-    font-size: 0.95rem;
-    transition: border-color 0.2s;
-}
-
-.search-input:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.search-icon {
-    position: absolute;
-    left: 0.75rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #9ca3af;
-    pointer-events: none;
-}
-
-.search-icon svg {
-    width: 1.25rem;
-    height: 1.25rem;
-}
-
-/* --- USER CARD DESIGN --- */
-.user-card {
-    background: white;
-    border: 1px solid #e5e7eb; /* Subtle border */
-    border-radius: 0.75rem;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-    padding: 1.25rem;
-    display: flex;
-    flex-wrap: wrap; /* KEY FIX: Allows actions to drop to next line */
-    align-items: center;
-    gap: 1rem;
-    transition: all 0.2s ease;
-}
-
-.user-card:hover {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
-    border-color: #d1d5db;
-}
-
-/* Checkbox styling */
-.user-checkbox {
-    width: 1.2rem;
-    height: 1.2rem;
-    cursor: pointer;
-    border-radius: 4px;
-    accent-color: #3b82f6;
-}
-
-/* Avatar styling */
-.user-avatar {
-    flex-shrink: 0;
-}
-
-.user-avatar img {
-    width: 3.5rem; /* Slightly larger matching target */
-    height: 3.5rem;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid #fff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-/* User Info Styling */
-.user-info {
-    flex: 1; /* Takes up remaining space in top row */
-    min-width: 120px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.user-name,
-.card-user-name {
-    font-size: 1.05rem;
-    font-weight: 600;
-    color: #111827;
-    margin: 0;
-    line-height: 1.2;
-}
-
-.user-id {
-    font-size: 0.8rem;
-    color: #6b7280;
-    margin-top: 2px;
-}
-
-/* The "ADMIN" Pill Badge */
-.user-role {
-    display: inline-block;
-    width: fit-content;
-    background-color: #eff6ff; /* Light Blue Background */
-    color: #3b82f6;            /* Blue Text */
-    font-size: 0.7rem;
-    font-weight: 700;
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;     /* Pill shape */
-    margin-top: 0.5rem;
-    text-transform: uppercase;
-    letter-spacing: 0.025em;
-}
-
-/* Special case if role is NOT admin (optional) */
-.user-role:not(:contains("ADMIN")) {
-    background-color: #f3f4f6;
-    color: #4b5563;
-}
-
-/* --- CARD ACTIONS (Footer Area) --- */
-.user-actions {
-    flex-basis: 100%; /* Forces this to take full width (new line) */
-    display: flex;
-    justify-content: flex-end; /* Align buttons to right */
-    gap: 0.75rem;
-    padding-top: 1rem;
-    margin-top: 0.5rem;
-    border-top: 1px solid #f3f4f6; /* Divider line */
-}
-
-/* Button Styles from your snippet (Refined) */
+/* 1. The Square Action Buttons (Edit/Delete inside cards) */
 .btn-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 0.75rem; /* Squircle */
+    
+    /* BIGGER SIZE: 3.5rem is approx 56px (Standard mobile touch target) */
+    width: 3.5rem !important; 
+    height: 3.5rem !important;
+    
+    border-radius: 1rem; /* Smooth Squircle */
     border: none;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: transform 0.1s, background-color 0.2s;
 }
 
-/* Edit Button (Blue Tint) */
+.btn-icon:active {
+    transform: scale(0.95); /* Little click effect */
+}
+
+/* Make the icons inside larger too so they don't look lost */
+.btn-icon svg {
+    width: 1.5rem !important;
+    height: 1.5rem !important;
+    stroke-width: 2px;
+}
+
+/* 2. The Text Buttons (Add User / Top Controls) */
+.btn-primary, 
+.btn-danger,
+.btn-add-user {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    
+    /* Make these taller and wider */
+    padding: 0.85rem 1.5rem !important;
+    height: 3.5rem; /* Match the height of the square buttons */
+    
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 1rem !important;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+/* --- COLORS (Keep existing logic, just ensuring application) --- */
 .btn-edit {
     background-color: #eff6ff;
     color: #3b82f6;
 }
-
 .btn-edit:hover {
+    background-color: #dbeafe;
+    color: #2563eb;
+}
+
+.btn-delete {
+    background-color: #fef2f2;
+    color: #ef4444;
+}
+.btn-delete:hover {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+.btn-primary {
     background-color: #3b82f6;
     color: white;
 }
-
-/* Delete Button (Red Tint) */
-.btn-delete {
-    background-color: #f3f4f6; /* Grayish base */
-    color: #374151;
+.btn-primary:hover {
+    background-color: #2563eb;
 }
 
-.btn-delete:hover {
-    background-color: #fee2e2;
-    color: #ef4444;
+/* --- CARD FOOTER SPACING --- */
+/* Since buttons are bigger, we need more room in the footer */
+.user-actions {
+    flex-basis: 100%;
+    display: flex;
+    justify-content: flex-end; /* Pushes buttons to right */
+    gap: 1rem; /* More space between buttons */
+    
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #f3f4f6;
 }
 
-/* SVG Icon Sizing */
-.btn-icon svg {
-    width: 1.25rem;
-    height: 1.25rem;
-}
-
-/* --- MOBILE OPTIMIZATION --- */
+/* --- MOBILE SPECIFIC FIXES --- */
 @media (max-width: 640px) {
-    .controls-bar {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
+    /* On mobile, we ensure the "Add User" button spans full width for easy thumb reach */
     .action-buttons {
         width: 100%;
+        display: flex;
+        gap: 0.75rem;
     }
     
-    .action-buttons .btn-primary {
-        flex: 1; /* Add user button full width */
+    .btn-primary, .btn-danger {
+        flex: 1; /* Grow to fill width */
         justify-content: center;
     }
 
-    .search-wrapper {
-        max-width: 100%;
+    /* Ensure Card buttons don't overflow if screen is very tiny */
+    .user-actions {
+        justify-content: space-between; /* Spread them out or keep flex-end */
     }
     
-    .users-grid {
-        grid-template-columns: 1fr; /* 1 column on mobile */
+    .btn-icon {
+        /* On mobile, we keep them huge (3.5rem), 
+           but you can go to 3rem if 3.5 is TOO big for your specific phone screen */
+        width: 3.5rem !important; 
+        height: 3.5rem !important;
     }
 }
