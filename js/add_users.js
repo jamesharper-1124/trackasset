@@ -141,12 +141,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     contentType: false,
                     success: function (data) {
                         alert('Profile has been added successfully. Let the user know to check its email for verification.');
-                        if (data.redirect) {
-                            window.location.href = data.redirect;
-                        } else {
-                            submitBtn.disabled = false;
-                            submitBtn.textContent = originalBtnText;
-                        }
+                        // Force redirect to local users.html instead of backend's redirect
+                        window.location.href = 'users.html';
                     },
                     error: function (xhr) {
                         submitBtn.disabled = false;
