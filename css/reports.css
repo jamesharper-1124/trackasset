@@ -698,17 +698,29 @@ body {
         /* Auto width */
     }
 
-    /* Add Button (+) */
-    .btn-primary.btn-icon-only {
-        width: 40px !important;
-        height: 40px !important;
-        flex: 0 0 40px !important;
-        border-radius: 50%;
-        padding: 0;
-        display: inline-flex;
+    /* Add Button (Square/Rect with Text) */
+    .btn-add-report {
+        display: inline-flex !important;
         align-items: center;
         justify-content: center;
+        width: auto !important;
+        height: 40px !important;
+        padding: 0 16px !important;
+        border-radius: 8px !important;
+        /* Square-ish with rounded corners */
+        text-decoration: none;
+        flex: 0 0 auto !important;
+        order: 3;
     }
+
+    .btn-add-report span {
+        display: inline !important;
+        /* Force text show */
+        font-weight: 500;
+    }
+
+    /* Remove old circle style overrides just in case */
+    /* .btn-primary.btn-icon-only ruleset removed to avoid empty block warning */
 
     /* Delete Button */
     #btn-delete-selected {
