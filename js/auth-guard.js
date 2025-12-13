@@ -21,6 +21,7 @@ $(document).ajaxSuccess(function (event, xhr, settings) {
 
             if (!window.hasAlertedSession) {
                 window.hasAlertedSession = true;
+
                 alert('Session Expired. Please log in again.');
                 localStorage.removeItem('auth_token');
                 window.location.href = 'login.html';
@@ -64,18 +65,37 @@ $(document).ajaxError(function (event, jqxhr, settings, thrownError) {
                 // Token is valid.
                 console.log('Token validated:', user);
 
-                // Update Header User Name
-                const nameDisplay = document.getElementById('user-name-display');
-                if (nameDisplay && user.firstname) {
-                    nameDisplay.textContent = user.firstname;
-                }
+                $(document).ready(function () {
+                    // Update Header User Name
+                    const nameDisplay = document.getElementById('user-name-display');
+                    if (nameDisplay && user.firstname) {
+                        nameDisplay.textContent = user.firstname;
+                    }
 
-                // Update User Role/Admin Links
-                if (user && user.role === 'admin') {
-                    // Show admin links if hidden
-                    const navUsers = document.getElementById('nav-users');
-                    if (navUsers) navUsers.style.display = 'flex'; // Use flex to match .nav-link style
-                }
+                    // Update Profile Image
+                    const profileImg = document.getElementById('user-profile-img');
+                    if (profileImg) {
+                        // Standardize on checking profile_photo first, then fallback
+                        const photoPath = user.profile_photo || user.profile_photo_url;
+
+                        if (photoPath) {
+                            let url = photoPath;
+                            if (!url.startsWith('http')) {
+                                // Ensure leading slash for API URL construction
+                                const path = url.startsWith('/') ? url : '/' + url;
+                                url = CONFIG.apiUrl(path);
+                            }
+                            profileImg.src = url;
+                        }
+                    }
+
+                    // Update User Role/Admin Links
+                    if (user && user.role === 'admin') {
+                        // Show admin links if hidden
+                        const navUsers = document.getElementById('nav-users');
+                        if (navUsers) navUsers.style.display = 'flex';
+                    }
+                });
             },
             error: function (xhr) {
                 // 401 is now handled by the global ajaxError handler defined above.
