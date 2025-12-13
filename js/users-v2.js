@@ -165,12 +165,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Exact Blade Structure
         card.innerHTML = `
-            <input type="checkbox" class="user-checkbox" value="${user.id}" data-role="${user.role}" style="display: none;">
+            <input type="checkbox" class="user-checkbox" value="${user.id}" data-role="${user.role}">
             <div class="user-avatar">
                 <img src="${photoUrl}" alt="${user.firstname}" onerror="this.src='images/profile_pic/default.png'">
             </div>
             <div class="user-info">
-                <h3 class="user-name" title="${fullName}">
+                <h3 class="card-user-name" title="${fullName}">
                     ${fullName}
                 </h3>
                 <p class="user-id" style="font-size: 0.8rem; color: #6b7280;">User ID: ${user.id}</p>
