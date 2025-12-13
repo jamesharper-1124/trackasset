@@ -125,8 +125,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 submitBtn.textContent = 'Saving...';
 
+                // Construct correct API URL
+                let actionUrl = this.getAttribute('action');
+                if (typeof CONFIG !== 'undefined' && CONFIG.API_BASE_URL && actionUrl.startsWith('/')) {
+                    actionUrl = CONFIG.API_BASE_URL + actionUrl;
+                }
+
                 $.ajax({
-                    url: this.action,
+                    url: actionUrl,
                     method: 'POST',
                     data: formData,
                     processData: false,
