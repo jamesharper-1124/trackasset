@@ -224,7 +224,7 @@ body {
 
 
 /* =========================================
-   3. REPORTS PAGE DESIGN (Inventories Style)
+   3. REPORTS PAGE DESIGN (Table Layout)
    ========================================= */
 
 /* Controls Bar */
@@ -235,7 +235,6 @@ body {
     margin-bottom: 24px;
     gap: 12px;
     flex-wrap: nowrap;
-    /* Force single row */
 }
 
 .search-wrapper {
@@ -278,7 +277,6 @@ body {
     gap: 12px;
     align-items: center;
     flex-shrink: 0;
-    /* Prevent buttons from shrinking */
 }
 
 .btn-primary {
@@ -316,14 +314,12 @@ body {
     color: white;
     border: none;
     padding: 10px 16px;
-    /* Match other buttons height-wise roughly */
     border-radius: 12px;
     font-weight: 500;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     white-space: nowrap;
-    /* Prevent text wrapping */
     transition: all 0.2s;
     box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2);
 }
@@ -337,15 +333,6 @@ body {
 .btn-secondary:hover {
     transform: translateY(-1px);
     box-shadow: 0 6px 8px -1px rgba(0, 0, 0, 0.1);
-}
-
-/* Grid Layout */
-.reports-dashboard-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 24px;
-    padding-bottom: 80px;
-    align-items: start;
 }
 
 /* Section Titles */
@@ -368,186 +355,134 @@ body {
     font-size: 0.8rem;
 }
 
-/* Card Design (Horizontal / Hybrid) */
-.report-card {
+/* Table Styles */
+.reports-section-wrapper {
+    padding-bottom: 40px;
+}
+
+.reports-table-container {
     background: white;
     border-radius: 12px;
-    overflow: hidden;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    border: 1px solid #f1f5f9;
-    transition: transform 0.2s, box-shadow 0.2s;
-    position: relative;
-    display: flex;
-    flex-direction: column;
+    border: 1px solid #e2e8f0;
+    overflow-x: auto;
+    /* Enable horizontal scroll */
 }
 
-.report-card-body {
-    display: flex;
-    flex-direction: row;
-    /* FORCE HORIZONTAL */
-    padding: 12px;
-    gap: 12px;
-    align-items: flex-start;
-    /* Align top */
+.reports-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+    /* Force minimum width for table integrity */
+}
+
+.reports-table th,
+.reports-table td {
+    padding: 16px;
+    text-align: left;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+
+.reports-table th {
+    background-color: #f8fafc;
+    font-weight: 600;
+    color: #475569;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+}
+
+.reports-table tr:last-child td {
+    border-bottom: none;
+}
+
+.reports-table tbody tr {
+    transition: background-color 0.2s;
     cursor: pointer;
-    width: 100%;
 }
 
-.report-card-image-wrapper {
-    width: 80px;
-    height: 80px;
-    flex-shrink: 0;
+.reports-table tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+/* Table Image */
+.report-table-img {
+    width: 48px;
+    height: 48px;
     border-radius: 8px;
-    background: #f1f5f9;
-    text-align: center;
-    line-height: 1.2;
-    overflow: hidden;
-    /* Ensure image doesn't overflow */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.report-img {
-    width: 100%;
-    height: 100%;
     object-fit: cover;
+    border: 1px solid #e2e8f0;
 }
 
-.no-image-placeholder {
-    font-size: 0.7rem;
-    color: #94a3b8;
-    padding: 4px;
-}
-
-.report-card-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    min-width: 0;
-    /* Enable ellipsis */
-    gap: 4px;
-}
-
-.status-badge {
-    position: absolute;
-    top: 12px;
-    left: 12px;
+/* Status Badge */
+.report-status-badge {
     padding: 4px 10px;
     border-radius: 20px;
     font-size: 0.75rem;
     font-weight: 600;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(4px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    white-space: nowrap;
 }
 
 .status-good {
+    background-color: #d1fae5;
     color: #059669;
 }
 
-.status-attention {
+.status-fair {
+    background-color: #fef3c7;
     color: #d97706;
 }
 
-.status-ng {
+.status-danger {
+    background-color: #fee2e2;
     color: #dc2626;
 }
 
-.report-header {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
-.report-meta-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.7rem;
-    color: #64748b;
-    margin-bottom: 2px;
-}
-
-.report-inv-name {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #1e293b;
-    margin: 0;
+/* Helpers */
+.text-truncate {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: #64748b;
 }
 
-.report-room {
-    font-size: 0.8rem;
-    color: #64748b;
+.font-medium {
     font-weight: 500;
-}
-
-.report-body-preview {
-    margin-top: 4px;
-}
-
-.report-remarks {
-    font-size: 0.8rem;
     color: #334155;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: block;
+}
+
+.no-image-text {
+    color: #94a3b8;
+    font-size: 0.8rem;
     font-style: italic;
 }
 
-.report-footer {
+/* Checkbox Wrapper in TD/TH */
+.td-checkbox-wrapper,
+.th-checkbox-wrapper {
     display: flex;
-    justify-content: flex-end;
-    /* Align status to right */
-    margin-top: 4px;
-}
-
-
-/* Checkbox */
-.card-checkbox-wrapper {
-    position: absolute;
-    top: 8px;
-    left: 8px;
-    /* Move to Left as requested */
-    z-index: 10;
-    display: flex;
-    /* Always flex */
-    background: rgba(255, 255, 255, 0.8);
-    border-radius: 4px;
-    padding: 2px;
+    justify-content: center;
+    align-items: center;
 }
 
 .report-checkbox {
-    width: 20px;
-    height: 20px;
-    accent-color: #4f46e5;
+    width: 18px;
+    height: 18px;
     cursor: pointer;
+    accent-color: #4f46e5;
 }
 
-/* Circular Icon Button */
-.btn-icon-only {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    padding: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    /* NEVER shrink */
+/* Empty State */
+.empty-state {
+    padding: 32px;
+    text-align: center;
+    color: #6b7280;
+    font-style: italic;
 }
 
-.btn-icon-only span {
-    display: none;
-    /* Hide text */
-}
-
-/* Modal */
+/* Modal (reused from before, ensure it works) */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -601,7 +536,6 @@ body {
     max-height: 300px;
     width: 100%;
     object-fit: contain;
-    /* Changed to contain so we see full image */
 }
 
 .modal-close {
@@ -646,20 +580,11 @@ body {
     border-radius: 8px;
 }
 
-/* Mobile */
-/* Mobile Layout (Optimized for 350px+) */
+/* Mobile Responsive */
 @media (max-width: 768px) {
-
-    /* 1. Header Controls: Search | Delete | Plus */
-    /* We use a single flex container. .action-buttons uses display: contents to let its children participate directly. */
-    /* 1. Header Controls: Search | Delete | Plus */
-    /* We use a single flex container. .action-buttons uses display: contents to let its children participate directly. */
-    /* 1. Header Controls: Search | Delete | Plus */
-    /* Safer Flexbox approach (No display: contents) */
     .controls-bar {
         display: flex !important;
         flex-direction: row !important;
-        /* Force Horizontal */
         align-items: center;
         gap: 8px;
         flex-wrap: nowrap !important;
@@ -668,17 +593,13 @@ body {
 
     .search-wrapper {
         flex: 1;
-        /* Take remaining space */
         min-width: 0;
-        /* Allow shrinking */
-        max-width: none;
     }
 
     .search-input {
         padding: 8px 10px 8px 36px;
         font-size: 0.9rem;
         height: 40px;
-        /* Match button height */
     }
 
     .search-icon {
@@ -687,114 +608,29 @@ body {
         height: 16px;
     }
 
-    /* Container for buttons */
     .action-buttons {
-        display: flex;
         gap: 8px;
-        flex-shrink: 0;
-        /* Don't shrink */
-        align-items: center;
-        width: auto;
-        /* Auto width */
     }
 
-    /* Add Button (+) */
-    .btn-primary.btn-icon-only {
-        width: 40px !important;
-        height: 40px !important;
-        flex: 0 0 40px !important;
-        border-radius: 50%;
+    .btn-primary.btn-add-report span {
+        display: none;
+        /* Hide text on mobile */
+    }
+
+    .btn-primary.btn-add-report svg {
+        margin: 0 !important;
+    }
+
+    .btn-primary.btn-add-report {
         padding: 0;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    /* Delete Button */
-    #btn-delete-selected {
-        font-size: 0.75rem;
-        padding: 0 10px;
+        width: 40px;
         height: 40px;
-        /* Match height */
-        white-space: nowrap;
-        display: inline-flex;
-        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
     }
 
-    /* On very small screens, hide "Delete Selected" text, just show icon? */
-    @media (max-width: 360px) {
-        #btn-delete-selected span.btn-text {
-            display: none;
-        }
-
-        #btn-delete-selected {
-            width: 40px;
-            padding: 0;
-            justify-content: center;
-        }
-
-        #btn-delete-selected svg {
-            margin-right: 0 !important;
-        }
-    }
-
-    /* 3. Card Styling (Vertical) */
-    .report-card-body {
-        flex-direction: column;
-        padding: 0;
-    }
-
-    .report-card-image-wrapper {
-        width: 100%;
-        height: 120px;
-        /* Slightly taller for cover */
-        border-radius: 12px 12px 0 0;
-        margin: 0;
-    }
-
-    .report-card-content {
-        padding: 12px;
-        gap: 6px;
-    }
-
-
-    .report-inv-name {
-        font-size: 0.85rem;
-        line-height: 1.2;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .report-room {
-        font-size: 0.75rem;
-    }
-
-    .status-badge {
-        top: 6px;
-        left: 6px;
-        font-size: 0.65rem;
-        padding: 2px 6px;
-    }
-
-    /* Checkbox - Always Visible Top Left */
-    .card-checkbox-wrapper {
-        top: 6px;
-        left: 6px;
-        z-index: 20;
-        /* Above status badge if overlap, but status is also absolute */
-        background: white;
-        border-radius: 4px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    /* Move status badge to right if checkbox is left? Or overlap? 
-       Let's put status badge on the image bottom-right or top-right?
-       User said "checkbox on the left". 
-       Let's move status badge to Top Right.
-    */
-    .status-badge {
-        left: auto;
-        right: 6px;
+    /* Keep table horizontal scroll */
+    .reports-table-container {
+        border-radius: 8px;
     }
 }
