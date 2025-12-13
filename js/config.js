@@ -4,6 +4,9 @@ const CONFIG = {
 
     // Helper to get full API URL
     apiUrl: function (path) {
+        if (!this.API_BASE_URL) {
+            console.warn('CONFIG.API_BASE_URL is missing! Requesting path relative to root:', path);
+        }
         return `${this.API_BASE_URL}${path}`;
     }
 };
