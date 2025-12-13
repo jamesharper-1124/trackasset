@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function fetchReportsData() {
         $.ajax({
-            url: '/api/reports/data',
+            url: CONFIG.apiUrl('/api/reports/data'),
             method: 'GET',
             success: function (data) {
                 renderReports(data);
@@ -89,7 +89,9 @@ document.addEventListener('DOMContentLoaded', function () {
         // Image Section
         let imageHtml = '';
         if (photoUrl) {
-            imageHtml = `<img src="${photoUrl}" alt="Evidence" class="report-img">`;
+            // Fix: Use CONFIG.apiUrl if it's not a full URL
+            const fullPhotoUrl = photoUrl.startsWith('http') ? photoUrl : CONFIG.apiUrl(photoUrl);
+            imageHtml = `<img src="${fullPhotoUrl}" alt="Evidence" class="report-img">`;
         } else {
             imageHtml = `<div class="no-image-placeholder">No Image</div>`;
         }
@@ -177,7 +179,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Redundant token check removed - rely on auth-guard or backend 401
         const idsArray = Array.from(selectedReportIds);
         $.ajax({
-            url: '/api/reports/bulk-delete',
+            url: CONFIG.apiUrl('/api/reports/bulk-delete'),
             method: 'DELETE',
             data: { ids: idsArray },
             success: function (res) {
@@ -272,7 +274,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!confirm('Delete this report?')) return;
 
         $.ajax({
-            url: `/api/reports/${currentReportId}`,
+            url: CONFIG.apiUrl(`/api/reports/${currentReportId}`),
             method: 'DELETE',
             success: function (res) {
                 alert('Report has been deleted.');
