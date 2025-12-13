@@ -1,82 +1,142 @@
-$(document).ready(function () {
+document.addEventListener('DOMContentLoaded', function () {
     console.log('Profile Settings Script Loaded');
 
-    const form = $('form[action*="settings"]');
+    const form = document.getElementById('settings-form');
+    const token = localStorage.getItem('auth_token');
 
-    if (form.length > 0) {
-        form.on('submit', function (e) {
-            e.preventDefault();
-            console.log('Profile Settings submission intercepted');
+    if (!token) {
+        window.location.href = 'login.html';
+        return;
+    }
 
-            const token = localStorage.getItem('auth_token');
-            if (!token) {
-                alert('Authentication token missing. Please login again.');
-                window.location.href = '/login';
-                return;
+    // 1. Fetch Current User Data
+    // We can use the /api/user endpoint provided by Sanctum to get the current user
+    const fetchUrl = CONFIG.apiUrl('/api/user');
+
+    $.ajax({
+        url: fetchUrl,
+        method: 'GET',
+        headers: { 'Authorization': 'Bearer ' + token },
+        success: function (user) {
+            console.log('Current User Fetched:', user);
+
+            // Populate Inputs
+            $('input[name="firstname"]').val(user.firstname);
+            $('input[name="lastname"]').val(user.lastname);
+            $('input[name="email"]').val(user.email);
+            $('input[name="username"]').val(user.username);
+            $('input[name="phone"]').val(user.phone);
+            $('input[name="address"]').val(user.address);
+
+            // Role Display
+            $('input[name="role_display"]').val(user.role.charAt(0).toUpperCase() + user.role.slice(1));
+
+            // Handle Profile Photo Preview
+            if (user.profile_photo_url || user.profile_photo) {
+                let photoUrl = user.profile_photo_url || user.profile_photo;
+                if (!photoUrl.startsWith('http')) {
+                    photoUrl = CONFIG.apiUrl(photoUrl);
+                }
+                $('#preview-img').attr('src', photoUrl);
+
+                // Also update header image
+                $('#user-profile-img').attr('src', photoUrl);
+                $('#user-name-display').text(user.firstname);
             }
+        },
+        error: function (err) {
+            console.error('Fetch error:', err);
+            // If 401, auth-guard handles it usually, but just in case
+            if (err.status === 401) window.location.href = 'login.html';
+        }
+    });
+
+    // 2. Handle Submission
+    if (form) {
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            console.log('Submitting settings update...');
+
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Saving...';
 
             const formData = new FormData(this);
+            formData.append('_method', 'PUT'); // Laravel requirement
 
-            // Inject Compressed Image if available
-            const fileInput = document.getElementById('profile_photo_input');
-            if (fileInput && fileInput.processedBlob) {
-                console.log('Using Processed Blobed Image: ' + (fileInput.processedBlob.size / 1024).toFixed(2) + 'KB');
-                formData.set('profile_photo', fileInput.processedBlob, 'profile_compressed.jpg');
-            }
-
-            // Ensure PUT method spoofing is present if it's not already
-            if (!formData.has('_method')) {
-                formData.append('_method', 'PUT');
-            }
-
-            // Log data for debugging
-            for (var pair of formData.entries()) {
-                console.log(pair[0] + ', ' + pair[1]);
-            }
-
-            // Use the form's action attribute as the URL (e.g. /api/settings)
-            // Ensure your route('settings.update') returns the API route URL
-            const submitUrl = $(this).attr('action');
+            const submitUrl = CONFIG.apiUrl('/api/settings'); // Explicit setting route
 
             $.ajax({
                 url: submitUrl,
-                type: 'POST', // POST with _method: PUT
+                method: 'POST', // POST with _method=PUT
                 data: formData,
-                headers: {
-                    'Authorization': 'Bearer ' + token,
-                    'Accept': 'application/json'
-                },
                 processData: false,
                 contentType: false,
+                headers: { 'Authorization': 'Bearer ' + token },
                 success: function (response) {
-                    console.log('Update success:', response);
-                    if (response.redirect) {
-                        alert(response.message || 'Profile updated successfully');
-                        window.location.href = response.redirect;
-                    } else {
-                        alert(response.message || 'Profile updated successfully');
-                        // Reload page or redirect to dashboard if no redirect provided
-                        window.location.href = '/dashboard';
-                    }
+                    alert('Profile updated successfully.');
+                    window.location.href = 'dashboard.html'; // Redirect to dashboard
                 },
                 error: function (xhr) {
-                    console.error('Update error:', xhr);
-                    let errorMsg = 'An error occurred during the update.';
-
-                    if (xhr.status === 401) {
-                        errorMsg = 'Session expired. Please login again.';
-                        window.location.href = '/login';
-                    } else if (xhr.responseJSON && xhr.responseJSON.message) {
-                        errorMsg = xhr.responseJSON.message;
-                    } else if (xhr.responseJSON && xhr.responseJSON.errors) {
-                        // Collect validation errors
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalBtnText;
+                    let msg = 'Update failed.';
+                    if (xhr.status === 422 && xhr.responseJSON.errors) {
                         let errors = Object.values(xhr.responseJSON.errors).flat();
-                        errorMsg = 'Validation Error:\n' + errors.join('\n');
+                        msg = 'Validation Error:\n' + errors.join('\n');
+                    } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                        msg += ' ' + xhr.responseJSON.message;
                     }
-
-                    alert(errorMsg);
+                    alert(msg);
                 }
             });
         });
     }
+
+    // Sidebar & Dropdown Toggles (Standard)
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const dropdownBtn = document.getElementById('dropdown-btn');
+    const dropdownMenu = document.getElementById('dropdown-menu'); // Ensure ID exists in HTML
+
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', function () {
+            sidebar.classList.toggle('show');
+            sidebarOverlay.classList.toggle('show');
+        });
+    }
+
+    if (sidebarOverlay) {
+        sidebarOverlay.addEventListener('click', function () {
+            sidebar.classList.remove('show');
+            sidebarOverlay.classList.remove('show');
+        });
+    }
+
+    // Explicit Dropdown Toggle for Settings Page
+    if (dropdownBtn) {
+        dropdownBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (dropdownMenu) {
+                dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+            }
+        });
+        document.addEventListener('click', function (e) {
+            if (dropdownMenu && !dropdownBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                dropdownMenu.style.display = 'none';
+            }
+        });
+    }
 });
+
+function previewImage(input) {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            document.getElementById('preview-img').src = e.target.result;
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
