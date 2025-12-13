@@ -131,6 +131,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     actionUrl = CONFIG.API_BASE_URL + actionUrl;
                 }
 
+                console.log('Submitting form to:', actionUrl); // DEBUG LOG
+
                 $.ajax({
                     url: actionUrl,
                     method: 'POST',
@@ -177,4 +179,3 @@ function previewImage(input) {
         reader.readAsDataURL(input.files[0]);
     }
 }
- 
