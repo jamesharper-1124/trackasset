@@ -650,11 +650,6 @@ body {
 /* Mobile Layout (Optimized for 350px+) */
 @media (max-width: 768px) {
 
-    .content-area {
-        padding: 1rem;
-        /* Reduce padding from 2rem to 1rem */
-    }
-
     /* 1. Header Controls: Search | Delete | Plus */
     /* We use a single flex container. .action-buttons uses display: contents to let its children participate directly. */
     /* 1. Header Controls: Search | Delete | Plus */
@@ -666,22 +661,30 @@ body {
         flex-direction: row !important;
         /* Force Horizontal */
         align-items: center;
-        gap: 12px;
-        /* Increased gap */
+        gap: 8px;
         flex-wrap: nowrap !important;
         width: 100%;
-        padding: 0;
-        /* reset padding */
     }
 
     .search-wrapper {
         flex: 1;
         /* Take remaining space */
-        width: 100%;
-        /* Ensure it tries to fill */
         min-width: 0;
-        /* Allow shrinking if absolutely necessary but prefer growing */
+        /* Allow shrinking */
         max-width: none;
+    }
+
+    .search-input {
+        padding: 8px 10px 8px 36px;
+        font-size: 0.9rem;
+        height: 40px;
+        /* Match button height */
+    }
+
+    .search-icon {
+        left: 10px;
+        width: 16px;
+        height: 16px;
     }
 
     /* Container for buttons */
@@ -695,33 +698,17 @@ body {
         /* Auto width */
     }
 
-    /* Removed duplicate blocks */
-
-    /* Add Button (Square/Rect with Text) */
-    .btn-add-report {
-        display: inline-flex !important;
+    /* Add Button (+) */
+    .btn-primary.btn-icon-only {
+        width: 40px !important;
+        height: 40px !important;
+        flex: 0 0 40px !important;
+        border-radius: 50%;
+        padding: 0;
+        display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: auto !important;
-        height: 42px !important;
-        /* Match search height */
-        padding: 0 16px !important;
-        border-radius: 8px !important;
-        text-decoration: none;
-        flex: 0 0 auto !important;
-        order: 3;
-        font-size: 0.9rem;
-        white-space: nowrap;
     }
-
-    .btn-add-report span {
-        display: inline !important;
-        /* Force text show */
-        font-weight: 500;
-    }
-
-    /* Remove old circle style overrides just in case */
-    /* .btn-primary.btn-icon-only ruleset removed to avoid empty block warning */
 
     /* Delete Button */
     #btn-delete-selected {
