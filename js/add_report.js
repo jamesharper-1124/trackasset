@@ -12,6 +12,59 @@ document.addEventListener('DOMContentLoaded', function () {
     const previewStatus = document.getElementById('preview-status');
     const searchUrl = searchInput ? searchInput.dataset.searchUrl : null;
 
+    // Helper: Resolve Image URL (matches inventories.js logic)
+    function resolveImageUrl(photoPath) {
+        if (!photoPath) return 'images/inventory/default.png';
+        if (photoPath.startsWith('http')) return photoPath;
+
+        let path = photoPath.startsWith('/') ? photoPath.substring(1) : photoPath;
+        // Basic heuristic for Laravel storage vs public images
+        if (path.includes('storage')) {
+            return CONFIG.apiUrl('/' + path); // likely /storage/...
+        } else if (path.startsWith('images/')) {
+            return CONFIG.apiUrl('/' + path);
+        } else {
+            // fallback assuming it's in storage if not specified
+            return CONFIG.apiUrl('/storage/' + path);
+        }
+    }
+
+    // 0. Check for inventory_id in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const preSelectedId = urlParams.get('inventory_id');
+
+    if (preSelectedId) {
+        // Fetch inventory details
+        const token = localStorage.getItem('auth_token');
+        if (token) {
+            $.ajax({
+                url: CONFIG.apiUrl('/api/inventories/' + preSelectedId),
+                method: 'GET', // API route exists: Route::get('/inventories/{inventory}', ...)
+                success: function (item) {
+                    if (item) {
+                        // Map API response to selectItem format
+                        // API returns: { id, inventory_name, inventory_photo, status_condition, room: { room_name, ... }, ... }
+                        // selectItem expects: { id, name, photo, status, room } (where room is string name)
+
+                        const mappedItem = {
+                            id: item.id,
+                            name: item.inventory_name,
+                            photo: resolveImageUrl(item.inventory_photo),
+                            status: item.status_condition,
+                            room: item.room ? item.room.room_name : 'Unassigned'
+                        };
+
+                        selectItem(mappedItem);
+                    }
+                },
+                error: function (xhr) {
+                    console.error('Error fetching pre-selected inventory:', xhr);
+                    // Silently fail or show toast? Just let user search manually.
+                }
+            });
+        }
+    }
+
     // AJAX Form Submission
     const addReportForm = document.getElementById('add-report-form');
     if (addReportForm) {
