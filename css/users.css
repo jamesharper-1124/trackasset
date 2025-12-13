@@ -1,188 +1,19 @@
-/* Users Grid */
+/* --- LAYOUT GRID --- */
 .users-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    /* Responsive grid: min 300px width cards */
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 1.5rem;
     padding: 1rem 0;
 }
 
-/* User Card */
-.user-card {
-    background: white;
-    border-radius: 0.5rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    padding: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    transition: box-shadow 0.2s;
-}
-
-.user-card:hover {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-/* User Avatar */
-.user-avatar {
-    flex-shrink: 0;
-}
-
-.user-avatar img {
-    width: 3rem;
-    height: 3rem;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid #e5e7eb;
-}
-
-/* User Info */
-.user-info {
-    flex-grow: 1;
-    min-width: 0;
-    /* Prevents text overflow issues */
-}
-
-.user-name,
-.card-user-name {
-    font-size: 1rem;
-    font-weight: 500;
-    color: #111827;
-    margin: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.user-role {
-    font-size: 0.875rem;
-    color: #6b7280;
-    margin: 0.25rem 0 0 0;
-}
-
-/* User Actions */
-.user-actions {
-    display: flex;
-    gap: 0.5rem;
-    flex-shrink: 0;
-}
-
-.btn-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 2rem;
-    height: 2rem;
-    border-radius: 0.375rem;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.2s, color 0.2s;
-}
-
-/* ... existing code ... */
-
-/* 
-   FIX: Mobile Name Display & Larger Delete Button 
-   Overriding global dashboard.css rules that hide .user-name 
-*/
-@media (max-width: 480px) {
-    .card-user-name {
-        display: block !important;
-        font-size: 1rem !important;
-        margin-bottom: 0.25rem;
-    }
-
-    /* Enlarge action buttons on mobile */
-    .user-actions .btn-icon {
-        width: 3.5rem !important;
-        /* 56px - Extra Large */
-        height: 3.5rem !important;
-        /* 56px */
-    }
-
-    .user-actions .btn-icon svg {
-        width: 1.75rem !important;
-        /* 28px */
-        height: 1.75rem !important;
-        /* 28px */
-    }
-}
-
-/* --- UNIFIED BUTTON STYLES (SQUIRCLE) --- */
-/* Target ALL buttons: Top Actions, Card Actions, Fake buttons */
-.btn,
-.btn-primary,
-.btn-danger,
-
-.btn-edit,
-.btn-delete,
-.btn-icon,
-.fake-btn-icon,
-button[type="button"] {
-    border-radius: 12px !important;
-    /* Force Squircle */
-    border: none !important;
-    outline: none !important;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-/* Specific Sizes */
-.btn-icon,
-.fake-btn-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.5rem !important;
-    /* Fixed Square size */
-    height: 2.5rem !important;
-}
-
-/* Colors - Ensure they apply */
-.btn-edit {
-    background-color: #eff6ff;
-    color: #3b82f6;
-}
-
-.btn-edit:hover {
-    background-color: #dbeafe;
-    color: #2563eb;
-}
-
-.btn-delete,
-.btn-delete-safe,
-.btn-danger {
-    background-color: #fef2f2;
-    color: #ef4444;
-}
-
-.btn-delete:hover,
-.btn-delete-safe:hover,
-.btn-danger:hover {
-    background-color: #fee2e2;
-    color: #dc2626;
-}
-
-.btn-primary {
-    background-color: #3b82f6;
-    color: white;
-}
-
-.btn-primary:hover {
-    background-color: #2563eb;
-}
-
-.btn-icon svg,
-.fake-btn-icon svg {
-    width: 1.25rem;
-    height: 1.25rem;
-}
-
-/* Controls Bar */
+/* --- CONTROLS BAR (Top Area) --- */
 .controls-bar {
     display: flex;
+    flex-wrap: wrap; /* Allows wrapping on mobile */
     justify-content: space-between;
     align-items: center;
+    gap: 1rem;
     margin-bottom: 2rem;
 }
 
@@ -191,156 +22,202 @@ button[type="button"] {
     gap: 1rem;
 }
 
-/* Text Buttons (Add User / Top Delete) override */
-.btn {
+.search-wrapper {
+    position: relative;
+    flex-grow: 1;
+    max-width: 400px; /* Prevent search from getting too wide */
+}
+
+.search-input {
+    width: 100%;
+    padding: 0.6rem 1rem 0.6rem 2.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    outline: none;
+    font-size: 0.95rem;
+    transition: border-color 0.2s;
+}
+
+.search-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.search-icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    pointer-events: none;
+}
+
+.search-icon svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+/* --- USER CARD DESIGN --- */
+.user-card {
+    background: white;
+    border: 1px solid #e5e7eb; /* Subtle border */
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    padding: 1.25rem;
+    display: flex;
+    flex-wrap: wrap; /* KEY FIX: Allows actions to drop to next line */
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.2s ease;
+}
+
+.user-card:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+    border-color: #d1d5db;
+}
+
+/* Checkbox styling */
+.user-checkbox {
+    width: 1.2rem;
+    height: 1.2rem;
+    cursor: pointer;
+    border-radius: 4px;
+    accent-color: #3b82f6;
+}
+
+/* Avatar styling */
+.user-avatar {
+    flex-shrink: 0;
+}
+
+.user-avatar img {
+    width: 3.5rem; /* Slightly larger matching target */
+    height: 3.5rem;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* User Info Styling */
+.user-info {
+    flex: 1; /* Takes up remaining space in top row */
+    min-width: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.user-name,
+.card-user-name {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.user-id {
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin-top: 2px;
+}
+
+/* The "ADMIN" Pill Badge */
+.user-role {
+    display: inline-block;
+    width: fit-content;
+    background-color: #eff6ff; /* Light Blue Background */
+    color: #3b82f6;            /* Blue Text */
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;     /* Pill shape */
+    margin-top: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+/* Special case if role is NOT admin (optional) */
+.user-role:not(:contains("ADMIN")) {
+    background-color: #f3f4f6;
+    color: #4b5563;
+}
+
+/* --- CARD ACTIONS (Footer Area) --- */
+.user-actions {
+    flex-basis: 100%; /* Forces this to take full width (new line) */
+    display: flex;
+    justify-content: flex-end; /* Align buttons to right */
+    gap: 0.75rem;
+    padding-top: 1rem;
+    margin-top: 0.5rem;
+    border-top: 1px solid #f3f4f6; /* Divider line */
+}
+
+/* Button Styles from your snippet (Refined) */
+.btn-icon {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.6rem 1.25rem;
-    /* Text button padding */
-    font-weight: 500;
-    font-size: 0.9rem;
-    /* rounded-corners handled by global rule */
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.75rem; /* Squircle */
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
-/* Ensure .btn-primary is applied if it wasn't already matched */
-.btn-primary {
+/* Edit Button (Blue Tint) */
+.btn-edit {
+    background-color: #eff6ff;
+    color: #3b82f6;
+}
+
+.btn-edit:hover {
     background-color: #3b82f6;
     color: white;
 }
 
-.btn svg {
-    width: 1.25rem;
-    height: 1.25rem;
-}
-
-.btn-primary {
-    background-color: #3b82f6;
-    color: white;
-}
-
-.btn-primary:hover {
-    background-color: #2563eb;
-}
-
-.btn-danger {
-    background-color: #ef4444;
-    color: white;
-}
-
-.btn-danger:hover {
-    background-color: #dc2626;
-}
-
-/* User Sections */
-.user-section {
-    margin-bottom: 2rem;
-}
-
-.section-title {
-    font-size: 1.25rem;
-    font-weight: 600;
+/* Delete Button (Red Tint) */
+.btn-delete {
+    background-color: #f3f4f6; /* Grayish base */
     color: #374151;
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid #e5e7eb;
 }
 
-/* Header Profile Name Override (Make it slightly smaller) */
-.header-right .user-name {
-    font-size: 0.85rem !important;
+.btn-delete:hover {
+    background-color: #fee2e2;
+    color: #ef4444;
 }
 
-/* Ensure Checkbox is visible */
-.user-checkbox {
-    display: inline-block !important;
-    margin-right: 0.75rem;
+/* SVG Icon Sizing */
+.btn-icon svg {
     width: 1.25rem;
     height: 1.25rem;
 }
 
-/* 
-   FIX: Mobile Name Display & Larger Delete Button 
-   Overriding global dashboard.css rules that hide .user-name 
-*/
-@media (max-width: 480px) {
-
-    /* Mobile Controls Layout */
+/* --- MOBILE OPTIMIZATION --- */
+@media (max-width: 640px) {
     .controls-bar {
         flex-direction: column;
-        gap: 1rem;
-        align-items: stretch !important;
+        align-items: stretch;
     }
 
     .action-buttons {
         width: 100%;
-        justify-content: space-between;
-        gap: 0.5rem;
     }
-
-    .action-buttons .btn {
-        flex: 1;
+    
+    .action-buttons .btn-primary {
+        flex: 1; /* Add user button full width */
         justify-content: center;
-        padding: 0.75rem 0.5rem !important;
-        min-width: 0;
-        white-space: nowrap;
-        border: 0 !important;
-        outline: 0 !important;
-        border-radius: 15px !important;
-        /* Squared Circle / Squircle */
-        font-size: 0.85rem !important;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
-        /* Nice floating effect */
     }
 
-    #user-search {
-        width: 100%;
-        padding: 0.75rem 0.75rem 0.75rem 2.5rem;
-        /* Ensure space for icon */
+    .search-wrapper {
+        max-width: 100%;
     }
-
-    /* Wrap User Card Content */
-    .user-card {
-        flex-wrap: wrap;
-    }
-
-    .user-info {
-        flex: 1 1 auto;
-        /* Allow growth */
-        min-width: 0;
-        /* Prevent overflow */
-    }
-
-    .card-user-name {
-        display: block !important;
-        font-size: 0.95rem !important;
-        font-weight: 500 !important;
-        margin-bottom: 0.25rem;
-    }
-
-    /* Buttons Below */
-    .user-actions {
-        width: 100%;
-        justify-content: flex-end;
-        /* Align right */
-        margin-top: 0.75rem;
-        padding-top: 0.75rem;
-        border-top: 1px solid #f3f4f6;
-        /* Optional separator */
-    }
-
-    /* Smaller Mobile Buttons */
-    .user-actions .btn-icon {
-        width: 2.25rem !important;
-        /* 36px - Medium Small */
-        height: 2.25rem !important;
-        /* 36px */
-    }
-
-    .user-actions .btn-icon svg {
-        width: 1.15rem !important;
-        /* ~18px */
-        height: 1.15rem !important;
-        /* ~18px */
+    
+    .users-grid {
+        grid-template-columns: 1fr; /* 1 column on mobile */
     }
 }
