@@ -165,7 +165,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Exact Blade Structure
         card.innerHTML = `
-            <input type="checkbox" class="user-checkbox" value="${user.id}" data-role="${user.role}">
+            ${checkboxHtml}
             <div class="user-avatar">
                 <img src="${photoUrl}" alt="${user.firstname}" onerror="this.src='images/profile_pic/default.png'">
             </div>
