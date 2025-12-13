@@ -216,11 +216,7 @@
     /* Allow wrapping on small screens */
 }
 
-align-items: center;
-margin-bottom: 24px;
-gap: 12px;
-flex-wrap: nowrap;
-}
+
 
 .search-wrapper {
     position: relative;
