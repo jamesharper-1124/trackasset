@@ -237,44 +237,63 @@
     .action-buttons {
         width: 100%;
         justify-content: space-between;
-        /* Spread buttons */
         gap: 0.5rem;
     }
 
     .action-buttons .btn {
         flex: 1;
-        /* Equal width buttons */
         justify-content: center;
         padding: 0.75rem;
-        /* Larger touch target */
     }
 
     #user-search {
         width: 100%;
-        padding: 0.75rem;
+        padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+        /* Ensure space for icon */
+    }
+
+    /* Wrap User Card Content */
+    .user-card {
+        flex-wrap: wrap;
+    }
+
+    .user-info {
+        flex: 1 1 auto;
+        /* Allow growth */
+        min-width: 0;
+        /* Prevent overflow */
     }
 
     .card-user-name {
         display: block !important;
         font-size: 0.95rem !important;
-        /* Slightly smaller than 1rem */
         font-weight: 500 !important;
-        /* Not bold */
         margin-bottom: 0.25rem;
     }
 
-    /* Enlarge action buttons on mobile (Refined size) */
+    /* Buttons Below */
+    .user-actions {
+        width: 100%;
+        justify-content: flex-end;
+        /* Align right */
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid #f3f4f6;
+        /* Optional separator */
+    }
+
+    /* Smaller Mobile Buttons */
     .user-actions .btn-icon {
-        width: 2.75rem !important;
-        /* 44px (Smaller than 56px, bigger than 32px) */
-        height: 2.75rem !important;
-        /* 44px */
+        width: 2.25rem !important;
+        /* 36px - Medium Small */
+        height: 2.25rem !important;
+        /* 36px */
     }
 
     .user-actions .btn-icon svg {
-        width: 1.35rem !important;
-        /* ~22px */
-        height: 1.35rem !important;
-        /* ~22px */
+        width: 1.15rem !important;
+        /* ~18px */
+        height: 1.15rem !important;
+        /* ~18px */
     }
 }
