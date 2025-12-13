@@ -1,0 +1,20 @@
+/* Shared Styles for Login and Registration 
+   File: public/css/logres.css
+*/
+
+/* Custom floating label animation */
+.floating-input:focus ~ label,
+.floating-input:not(:placeholder-shown) ~ label {
+    top: -0.5rem;
+    left: 0.8rem;
+    font-size: 0.75rem;
+    background-color: white;
+    padding: 0 0.2rem;
+    color: #4F46E5; /* Indigo-600 to match Tailwind theme */
+    transition: all 0.2s ease-in-out;
+}
+
+/* Optional: Add smooth transitions to buttons if not handled by Tailwind classes */
+button, a {
+    transition: all 0.2s ease-in-out;
+}
