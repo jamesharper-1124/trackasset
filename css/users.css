@@ -1,0 +1,232 @@
+/* Users Page CSS */
+
+/* Grid Layout */
+.users-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+/* User Card Styles */
+.user-card {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.user-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    border-color: #6366f1;
+}
+
+/* Checkbox absolute top-left */
+.card-checkbox-wrapper {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+}
+
+.user-checkbox {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #4f46e5;
+}
+
+/* Avatar */
+.user-avatar {
+    margin-bottom: 12px;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid #f3f4f6;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Info */
+.user-info {
+    margin-bottom: 16px;
+    width: 100%;
+}
+
+.user-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 4px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.user-meta {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin: 0 0 8px 0;
+}
+
+/* Role Badge */
+.user-role-badge {
+    padding: 4px 12px;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.role-admin {
+    background-color: #e0e7ff;
+    color: #4f46e5;
+}
+
+.role-staff {
+    background-color: #d1fae5;
+    color: #059669;
+}
+
+.role-user {
+    background-color: #f3f4f6;
+    color: #4b5563;
+}
+
+/* Actions */
+.user-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    width: 100%;
+    padding-top: 16px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.btn-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-edit {
+    background-color: #f0f9ff;
+    color: #0284c7;
+}
+
+.btn-edit:hover {
+    background-color: #e0f2fe;
+    color: #0369a1;
+}
+
+.btn-delete {
+    background-color: #fef2f2;
+    color: #dc2626;
+}
+
+.btn-delete:hover {
+    background-color: #fee2e2;
+    color: #b91c1c;
+}
+
+.btn-disabled {
+    background-color: #f3f4f6;
+    color: #9ca3af;
+    cursor: not-allowed;
+}
+
+/* Section Wrapper */
+.user-section-wrapper {
+    margin-bottom: 32px;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 16px;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 8px;
+    display: inline-block;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #6b7280;
+    font-style: italic;
+    background: white;
+    border-radius: 12px;
+    border: 1px dashed #e2e8f0;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .users-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
+        /* Full width on mobile */
+    }
+
+    .user-card {
+        flex-direction: row;
+        /* Horizontal on mobile for better stacking? OR keep grid? */
+        /* Let's keep it vertical but responsive, maybe horizontal card like inventory if requested later.
+           For now, stick to the card design but let it fill width. */
+        align-items: center;
+        text-align: left;
+        gap: 16px;
+    }
+
+    .user-avatar {
+        margin-bottom: 0;
+        width: 60px;
+        height: 60px;
+        flex-shrink: 0;
+    }
+
+    .user-info {
+        flex: 1;
+        margin-bottom: 0;
+    }
+
+    .user-actions {
+        width: auto;
+        flex-direction: column;
+        gap: 8px;
+        border-top: none;
+        padding-top: 0;
+        border-left: 1px solid #f1f5f9;
+        padding-left: 12px;
+    }
+
+    .btn-icon {
+        width: 32px;
+        height: 32px;
+    }
+
+    .card-checkbox-wrapper {
+        position: static;
+        margin-right: 8px;
+    }
+}
