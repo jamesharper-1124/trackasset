@@ -599,6 +599,8 @@ body {
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
+
+    /* Controls Bar Mobile */
     .controls-bar {
         display: flex !important;
         flex-direction: row !important;
@@ -611,26 +613,34 @@ body {
     .search-wrapper {
         flex: 1;
         min-width: 0;
+        /* Allow shrinking */
+        width: auto;
+        /* Override fixed width if any */
     }
 
     .search-input {
-        padding: 8px 16px 8px 40px;
+        padding: 8px 10px 8px 36px;
         font-size: 0.9rem;
         height: 40px;
+        width: 100%;
+        /* Fill wrapper */
     }
 
     .search-icon {
-        left: 12px;
+        left: 10px;
         width: 16px;
         height: 16px;
     }
 
     .action-buttons {
         gap: 8px;
+        flex-shrink: 0;
+        /* Prevent buttons from shrinking */
     }
 
     .btn-primary.btn-add-report span {
         display: none;
+        /* Hide text on mobile */
     }
 
     .btn-primary.btn-add-report svg {
@@ -640,6 +650,9 @@ body {
     .btn-primary.btn-add-report {
         padding: 0;
         width: 40px;
+        /* Fixed width */
+        min-width: 40px;
+        /* Force fixed width */
         height: 40px;
         justify-content: center;
         border-radius: 50%;
