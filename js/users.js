@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', function () {
         card.innerHTML = `
             <input type="checkbox" class="user-checkbox" value="${user.id}" data-role="${user.role}" style="display: none;">
             <div class="user-avatar">
-                <img src="${profileImg}" alt="${user.firstname}">
+                <img src="${photoUrl}" alt="${user.firstname}" onerror="this.src='images/profile_pic/default.png'">
             </div>
             <div class="user-info">
                 <h3 class="user-name" title="${fullName}">
