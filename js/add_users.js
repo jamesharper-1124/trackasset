@@ -42,8 +42,10 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
     // Generic AJAX Form Handler for User Forms (Add, Edit, Settings)
-    const userForm = document.querySelector('form[action*="/users"], form[action*="/settings"]');
+    const userForm = document.getElementById('add-user-form') || document.querySelector('form[action*="/users"], form[action*="/settings"]');
+
     if (userForm) {
+        console.log('Form found, attaching listener'); // Debug Log
         userForm.addEventListener('submit', function (e) {
             e.preventDefault();
 
