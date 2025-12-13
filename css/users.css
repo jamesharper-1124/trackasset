@@ -3,7 +3,8 @@
 /* Grid Layout */
 .users-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    /* Back to 280px to fit 350px better with padding */
     gap: 16px;
     margin-bottom: 32px;
     justify-content: start;
@@ -297,32 +298,60 @@
 
     .user-card {
         padding: 12px;
+        gap: 12px;
+        /* Reduce gap */
     }
 
     .user-avatar {
         width: 48px;
         height: 48px;
-        margin-right: 12px;
+        margin-right: 0;
+        /* Remove margin as gap handles it */
     }
 
     .user-actions {
         /* Keep horizontal on mobile too if space permits, or wrap if very small */
         /* User wants horizontal ID and buttons. */
         margin-left: auto;
-        gap: 6px;
+        gap: 4px;
+        /* Tighter buttons */
     }
 
     /* Ensure 350px support */
     @media (max-width: 380px) {
         .user-card {
-            flex-wrap: wrap;
+            padding: 8px;
+            /* Tighter padding */
+            gap: 8px;
+            /* Closer elements */
+            flex-wrap: nowrap;
+            /* Force row if possible, but handle overflow */
+        }
+
+        .user-avatar {
+            width: 40px;
+            /* Small avatar */
+            height: 40px;
+        }
+
+        .user-info .user-name {
+            font-size: 0.95rem;
+            /* Slightly smaller text */
+        }
+
+        .user-info .user-meta {
+            font-size: 0.75rem;
+        }
+
+        .btn-icon {
+            width: 28px;
+            /* Smaller buttons */
+            height: 28px;
         }
 
         .user-actions {
-            margin-left: 0;
-            margin-top: 8px;
-            width: 100%;
-            justify-content: flex-end;
+            flex-direction: row;
+            margin-left: auto;
         }
     }
 }
