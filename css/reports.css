@@ -603,27 +603,25 @@ body {
     /* Controls Bar Mobile */
     .controls-bar {
         display: flex !important;
-        flex-direction: row !important;
-        align-items: center;
-        gap: 8px;
+        flex-direction: column !important;
+        /* Stack vertically for all mobile */
+        align-items: stretch !important;
+        gap: 12px;
         flex-wrap: nowrap !important;
         width: 100%;
     }
 
     .search-wrapper {
-        flex: 1;
-        min-width: 0;
-        /* Allow shrinking */
-        width: auto;
-        /* Override fixed width if any */
+        flex: none;
+        width: 100%;
     }
 
     .search-input {
         padding: 8px 10px 8px 36px;
         font-size: 0.9rem;
-        height: 40px;
+        height: 48px;
+        /* Slightly taller for easy tapping */
         width: 100%;
-        /* Fill wrapper */
     }
 
     .search-icon {
@@ -635,27 +633,29 @@ body {
     .action-buttons {
         gap: 8px;
         flex-shrink: 0;
-        /* Prevent buttons from shrinking */
+        display: flex;
+        width: 100%;
     }
 
+    /* Restore Add Report Button Text and Shape */
     .btn-primary.btn-add-report span {
-        display: none;
-        /* Hide text on mobile */
+        display: inline;
+        /* Show text */
     }
 
     .btn-primary.btn-add-report svg {
-        margin: 0 !important;
+        margin-right: 6px !important;
     }
 
     .btn-primary.btn-add-report {
-        padding: 0;
-        width: 40px;
-        /* Fixed width */
-        min-width: 40px;
-        /* Force fixed width */
-        height: 40px;
+        padding: 0 16px;
+        width: auto;
+        height: 48px;
+        /* Match input height */
+        flex: 1;
+        /* Full width */
         justify-content: center;
-        border-radius: 50%;
+        border-radius: 12px;
     }
 
     /* Compact Delete Button for small screens */
