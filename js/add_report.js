@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const previewRoom = document.getElementById('preview-room');
     const previewStatus = document.getElementById('preview-status');
     // Use CONFIG for search URL
-    const searchUrl = CONFIG.apiUrl('/ajax/inventories/search');
+    const searchUrl = CONFIG.apiUrl('/api/ajax/inventories/search');
 
     // Helper: Resolve Image URL (matches inventories.js logic)
     function resolveImageUrl(photoPath) {
