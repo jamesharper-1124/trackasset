@@ -75,17 +75,21 @@ $(document).ajaxError(function (event, jqxhr, settings, thrownError) {
                     // Update Profile Image
                     const profileImg = document.getElementById('user-profile-img');
                     if (profileImg) {
-                        // Standardize on checking profile_photo first, then fallback
-                        const photoPath = user.profile_photo || user.profile_photo_url;
+                        try {
+                            // Standardize on checking profile_photo first, then fallback
+                            const photoPath = user.profile_photo || user.profile_photo_url;
 
-                        if (photoPath) {
-                            let url = photoPath;
-                            if (!url.startsWith('http')) {
-                                // Ensure leading slash for API URL construction
-                                const path = url.startsWith('/') ? url : '/' + url;
-                                url = CONFIG.apiUrl(path);
+                            if (photoPath && typeof photoPath === 'string') {
+                                let url = photoPath;
+                                if (!url.startsWith('http')) {
+                                    // Ensure leading slash for API URL construction
+                                    const path = url.startsWith('/') ? url : '/' + url;
+                                    url = CONFIG.apiUrl(path);
+                                }
+                                profileImg.src = url;
                             }
-                            profileImg.src = url;
+                        } catch (e) {
+                            console.error('Error updating profile image:', e);
                         }
                     }
 
