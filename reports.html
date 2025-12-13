@@ -1,272 +1,345 @@
-<!DOCTYPE html>
-<html lang="en">
+document.addEventListener('DOMContentLoaded', function () {
+    // Note: auth-guard.js handles global 401 checks on load and via ajax requests.
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reports - TrackAsset</title>
-    <!-- Link to custom CSS -->
-    <link rel="stylesheet" href="css/reports.css?v=11">
-    <link rel="stylesheet" href="css/dashboard.css?v=5">
-    <link rel="stylesheet" href="css/users.css?v=4">
-    <link rel="stylesheet" href="css/rooms.css?v=4">
+    const submittedContainer = document.getElementById('submitted-reports-container');
+    const receivedContainer = document.getElementById('received-reports-container');
+    const submittedSection = document.getElementById('submitted-reports-section');
+    const receivedSection = document.getElementById('received-reports-section');
+    const submittedCountEl = document.getElementById('submitted-count');
+    const receivedCountEl = document.getElementById('received-count');
 
-    <!-- Scripts -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="js/config.js?v=2"></script>
-    <script src="js/auth-guard.js?v=2"></script>
-    <script src="js/dashboard.js?v=2"></script>
-    <script src="js/reports.js?v=6"></script>
-</head>
+    // Selection Mode State
+    let selectedReportIds = new Set();
+    const btnDeleteText = document.getElementById('btn-delete-text');
 
-<body>
+    // Initial Fetch
+    fetchReportsData();
 
-    <div class="app-container">
+    function fetchReportsData() {
+        $.ajax({
+            url: CONFIG.apiUrl('/api/reports/data'),
+            method: 'GET',
+            success: function (data) {
+                renderReports(data);
+            },
+            error: function (xhr) {
+                // 401 handled globally by auth-guard
+                if (xhr.status !== 401) {
+                    console.error('Error loading reports:', xhr);
+                }
+            }
+        });
+    }
 
-        <!-- Sidebar -->
-        <aside id="sidebar" class="sidebar">
-            <div class="sidebar-header">
-                <span class="brand-text">TrackAsset</span>
+    function renderReports(data) {
+        const { submittedReports, receivedReports, currentUser } = data;
+
+        // Submitted Reports
+        const submittedContainer = document.getElementById('submitted-reports-container');
+        const submittedEmpty = document.getElementById('submitted-empty-state');
+        const submittedCountEl = document.getElementById('submitted-count');
+
+        submittedCountEl.textContent = submittedReports ? submittedReports.length : 0;
+
+        // Remove old content but keep empty state element
+        Array.from(submittedContainer.children).forEach(child => {
+            if (child.id !== 'submitted-empty-state') submittedContainer.removeChild(child);
+        });
+
+        if (submittedReports && submittedReports.length > 0) {
+            submittedEmpty.style.display = 'none';
+            submittedReports.forEach(report => {
+                submittedContainer.appendChild(createReportCard(report, currentUser, true));
+            });
+        } else {
+            submittedEmpty.style.display = 'block';
+        }
+
+        // Received Reports
+        const receivedContainer = document.getElementById('received-reports-container');
+        const receivedEmpty = document.getElementById('received-empty-state');
+        const receivedCountEl = document.getElementById('received-count');
+
+        receivedCountEl.textContent = receivedReports ? receivedReports.length : 0;
+        // Remove old content but keep empty state element
+        Array.from(receivedContainer.children).forEach(child => {
+            if (child.id !== 'received-empty-state') receivedContainer.removeChild(child);
+        });
+
+        if (receivedReports && receivedReports.length > 0) {
+            receivedEmpty.style.display = 'none';
+            receivedReports.forEach(report => {
+                receivedContainer.appendChild(createReportCard(report, currentUser, false));
+            });
+        } else {
+            receivedEmpty.style.display = 'block';
+        }
+    }
+
+    function createReportCard(report, currentUser, isSubmitted) {
+        const card = document.createElement('div');
+        card.className = 'h-card'; // Use horizontal card style
+        card.dataset.id = report.id;
+
+        // Store Full Object for Modal functionality
+        card.reportData = report;
+
+        const photoUrl = report.evidence_photo ? `/${report.evidence_photo}` : null;
+        const inventoryName = report.inventory ? report.inventory.inventory_name : 'Deleted Inventory';
+        const roomName = (report.inventory && report.inventory.room) ? report.inventory.room.room_name : 'Unknown Room';
+        const dateStr = new Date(report.date_reported).toLocaleDateString('en-US', {
+            year: 'numeric', month: 'short', day: 'numeric'
+        });
+
+        // Image Section
+        let imageHtml = '';
+        if (photoUrl) {
+            const fullPhotoUrl = photoUrl.startsWith('http') ? photoUrl : CONFIG.apiUrl(photoUrl);
+            imageHtml = `<img src="${fullPhotoUrl}" alt="Details">`;
+        } else {
+            imageHtml = `<span style="font-size:0.7rem; color:#9ca3af;">No Img</span>`;
+        }
+
+        // Status Badge Logic
+        let statusClass = 'status-good';
+        let statusText = report.status_condition || 'Unknown';
+        if (statusText === 'NEEDS ATTENTION') statusClass = 'status-fair';
+        if (statusText === 'N.G') statusClass = 'status-danger';
+
+        // Checkbox HTML
+        const checkboxHtml = `
+            <div class="card-checkbox-wrapper" onclick="event.stopPropagation()">
+                <input type="checkbox" class="report-checkbox" value="${report.id}">
             </div>
+        `;
 
-            <nav class="sidebar-nav">
-                <a href="dashboard.html" class="nav-link">
-                    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
-                        </path>
-                    </svg>
-                    Dashboard
-                </a>
-                <a href="inventories.html" class="nav-link">
-                    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01">
-                        </path>
-                    </svg>
-                    Inventories
-                </a>
-                <a href="reports.html" class="nav-link active">
-                    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 00-2 2v12a2 2 0 002 2h5l-4 4 4-4H9a2 2 0 00-2-2">
-                        </path>
-                    </svg>
-                    Reports
-                </a>
-                <a href="rooms.html" class="nav-link">
-                    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
-                        </path>
-                    </svg>
-                    Rooms
-                </a>
-
-                <!-- Admin Only Link (Handled by JS) -->
-                <a href="users.html" class="nav-link" id="nav-users" style="display: none;">
-                    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
-                        </path>
-                    </svg>
-                    Users
-                </a>
-            </nav>
-        </aside>
-
-        <!-- Overlay for mobile sidebar -->
-        <div id="sidebar-overlay" class="sidebar-overlay"></div>
-
-        <div class="main-wrapper">
-            <header class="top-header">
-                <div class="header-left">
-                    <button id="sidebar-toggle" class="sidebar-toggle">
-                        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 6h16M4 12h16M4 18h16"></path>
-                        </svg>
-                    </button>
-                    <h2 class="page-title">Reports</h2>
-                </div>
-                <div class="header-right">
-                    <div class="user-profile">
-                        <img id="user-profile-img" src="images/profile_pic/default.png" alt="Profile"
-                            class="profile-img">
-                        <span id="user-name-display" class="user-name">User</span>
-                    </div>
-
-                    <!-- Cog Dropdown -->
-                    <div style="position: relative;">
-                        <button id="dropdown-btn" style="background:none; border:none; cursor:pointer; color:#4b5563;">
-                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
-                                </path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                            </svg>
-                        </button>
-                        <!-- Dropdown Menu -->
-                        <div id="dropdown-menu"
-                            style="display:none; position:absolute; right:0; margin-top:0.5rem; width:12rem; background:white; border-radius:0.375rem; box-shadow:0 10px 15px -3px rgba(0,0,0,0.1); padding:0.25rem 0; z-index:50;">
-                            <a href="settings.html"
-                                style="display:block; padding:0.5rem 1rem; font-size:0.875rem; color:#374151; text-decoration:none;">Settings</a>
-                            <button id="logout-btn" type="button"
-                                style="display:block; width:100%; text-align:left; padding:0.5rem 1rem; font-size:0.875rem; color:#dc2626; background:none; border:none; cursor:pointer;">Logout</button>
-                        </div>
-                    </div>
-                </div>
-            </header>
-
-            <main class="content-area">
-                <!-- Controls Bar -->
-                <div class="controls-bar">
-                    <div class="search-wrapper">
-                        <span class="search-icon">
-                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                            </svg>
+        card.innerHTML = `
+            <div class="h-card-img-wrapper" onclick="openReportModal('${report.id}')">
+                ${imageHtml}
+            </div>
+            
+            <div class="h-card-content" onclick="openReportModal('${report.id}')">
+                <div class="h-card-info">
+                    <h4 class="h-card-title">${inventoryName}</h4>
+                    <div class="h-card-meta">
+                        <span class="meta-item">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                            ${roomName}
                         </span>
-                        <input type="text" id="reports-search" class="search-input" placeholder="Search reports...">
-                    </div>
-
-                    <div class="action-buttons">
-                        <!-- Delete Selected Button (Appears when items selected) -->
-                        <button id="btn-delete-selected" class="btn btn-danger" style="display: none;">
-                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                style="margin-right: 4px;">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                </path>
-                            </svg>
-                            <span class="btn-text">Delete Selected (<span id="selected-count">0</span>)</span>
-                        </button>
-
-                        <a href="add_report.html" class="btn btn-primary btn-add-report">
-                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                style="margin-right: 6px;">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 4v16m8-8H4"></path>
-                            </svg>
-                            <span>Add Report</span>
-                        </a>
+                        <span class="meta-item">
+                           <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                           ${dateStr}
+                        </span>
                     </div>
                 </div>
 
-                <!-- Unified Reports Grid (Cards) -->
-                <div class="reports-section-wrapper">
-
-                    <!-- 1. My Submitted Reports -->
-                    <div id="submitted-reports-section" class="report-section">
-                        <div class="section-title" id="submitted-toggle"
-                            style="cursor: pointer; justify-content: space-between;">
-                            <div style="display:flex; align-items:center; gap:8px;">
-                                My Submitted Reports
-                                <span class="section-count" id="submitted-count">0</span>
-                            </div>
-
-                            <!-- Bulk Select for Submitted -->
-                            <div style="display:flex; align-items:center; gap:8px;" onclick="event.stopPropagation()">
-                                <label
-                                    style="font-size: 0.85rem; color: #6b7280; display:flex; align-items:center; gap:4px; cursor:pointer; margin-right: 8px;">
-                                    <input type="checkbox" id="select-all-submitted"> Select All
-                                </label>
-                                <svg class="chevron-icon" width="20" height="20" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24" style="transition: transform 0.2s;">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 9l-7 7-7-7"></path>
-                                </svg>
-                            </div>
-                        </div>
-                        <div id="submitted-reports-container" class="reports-list">
-                            <!-- Cards populated by JS -->
-                            <p class="empty-state" id="submitted-empty-state" style="display:none;">No reports submitted
-                                yet.</p>
-                        </div>
-                    </div>
-
-                    <!-- 2. Received / Available Reports -->
-                    <div id="received-reports-section" class="report-section" style="margin-top: 2rem;">
-                        <div class="section-title" id="received-toggle"
-                            style="cursor: pointer; justify-content: space-between;">
-                            <div style="display:flex; align-items:center; gap:8px;">
-                                Available Reports
-                                <span class="section-count" id="received-count">0</span>
-                            </div>
-                            <svg class="chevron-icon" width="20" height="20" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24" style="transition: transform 0.2s;">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M19 9l-7 7-7-7"></path>
-                            </svg>
-                        </div>
-                        <div id="received-reports-container" class="reports-list">
-                            <!-- Cards populated by JS -->
-                            <p class="empty-state" id="received-empty-state" style="display:none;">No reports available.
-                            </p>
-                        </div>
-                    </div>
-
-                </div>
-
-            </main>
-
-            <!-- REPORT DETAILS MODAL -->
-            <div id="report-modal" class="modal-overlay">
-                <div class="modal-container">
-                    <button class="modal-close" id="modal-close-btn">&times;</button>
-                    <h3 class="modal-title" id="modal-title">Report Details</h3>
-
-                    <!-- View Mode -->
-                    <div id="modal-view-mode">
-                        <div class="modal-image-wrapper">
-                            <img id="modal-img" src="" alt="Report Image" style="display:none;">
-                        </div>
-                        <div class="modal-field">
-                            <label>Inventory Name</label>
-                            <div id="modal-inventory-name" class="field-value"></div>
-                        </div>
-                        <div class="modal-field">
-                            <label>Reported Issue</label>
-                            <div id="modal-remarks" class="field-value"></div>
-                        </div>
-                        <div class="modal-field">
-                            <label>Status Condition</label>
-                            <div id="modal-status" class="field-value"></div>
-                        </div>
-                        <div class="modal-field">
-                            <label>Date Reported</label>
-                            <div id="modal-date" class="field-value"></div>
-                        </div>
-                        <div class="modal-actions" id="modal-actions-submitted" style="display: none;">
-                            <button id="btn-delete-report" class="btn-danger">Delete</button>
-                        </div>
-                    </div>
-
-                    <!-- Edit Mode (Form) -->
-                    <form id="modal-edit-form" enctype="multipart/form-data" style="display: none;">
-                        <div class="modal-field">
-                            <label>Inventory Name</label>
-                            <input type="text" id="edit-inventory-name" class="form-input" disabled>
-                        </div>
-                        <div class="modal-field">
-                            <label>Reported Issue</label>
-                            <textarea name="remarks" id="edit-remarks" class="form-input" rows="4" required></textarea>
-                        </div>
-                        <div class="modal-field">
-                            <label>Update Evidence (Optional)</label>
-                            <input type="file" name="evidence_photo" class="form-input">
-                        </div>
-                        <div class="modal-actions">
-                            <button type="button" id="btn-cancel-edit" class="btn-secondary">Cancel</button>
-                            <button type="submit" class="btn-primary">Save Changes</button>
-                        </div>
-                    </form>
+                <div class="h-card-actions">
+                     <span class="card-status ${statusClass}">${statusText}</span>
+                     ${checkboxHtml}
                 </div>
             </div>
-        </div>
-    </div>
-</body>
+        `;
 
-</html>
+        return card;
+    }
+
+    // --------------------------------------------------------------------------
+    // Bulk Selection Logic
+    // --------------------------------------------------------------------------
+    const btnDeleteSelected = document.getElementById('btn-delete-selected');
+    const selectedCountSpan = document.getElementById('selected-count');
+
+    // Select All Checkboxes
+    const selectAllSubmitted = document.getElementById('select-all-submitted');
+
+    if (selectAllSubmitted) {
+        selectAllSubmitted.addEventListener('change', function () {
+            const isChecked = this.checked;
+            // Only select visible checkboxes in submitted table
+            const checkboxes = document.querySelectorAll('#submitted-reports-container .report-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = isChecked;
+                const id = parseInt(cb.value);
+                if (isChecked) selectedReportIds.add(id);
+                else selectedReportIds.delete(id);
+            });
+            updateDeleteButton();
+        });
+    }
+
+    // 1. Update Button Visibility
+    function updateDeleteButton() {
+        selectedCountSpan.textContent = selectedReportIds.size;
+
+        if (selectedReportIds.size > 0) {
+            btnDeleteSelected.style.display = 'inline-flex';
+        } else {
+            btnDeleteSelected.style.display = 'none';
+        }
+    }
+
+    // 2. Trigger Delete
+    btnDeleteSelected.addEventListener('click', function () {
+        if (confirm(`Delete ${selectedReportIds.size} selected reports?`)) {
+            performBulkDelete();
+        }
+    });
+
+    // Delegated Checkbox Click
+    $(document).on('change', '.report-checkbox', function (e) {
+        const id = parseInt(this.value);
+        if (this.checked) selectedReportIds.add(id);
+        else selectedReportIds.delete(id);
+
+        updateDeleteButton();
+    });
+
+    // Prevent modal opening when clicking checkbox wrapper
+    $(document).on('click', '.card-checkbox-wrapper', function (e) {
+        e.stopPropagation();
+    });
+
+    function performBulkDelete() {
+        // Redundant token check removed - rely on auth-guard or backend 401
+        const idsArray = Array.from(selectedReportIds);
+        $.ajax({
+            url: CONFIG.apiUrl('/api/reports/bulk-delete'),
+            method: 'DELETE',
+            data: { ids: idsArray },
+            success: function (res) {
+                alert('Report has been deleted.');
+                fetchReportsData();
+                exitSelectionMode();
+            },
+            error: function (xhr) {
+                // 401 handled globally
+                if (xhr.status !== 401) {
+                    alert('Bulk delete failed: ' + (xhr.responseJSON?.message || 'Unknown error'));
+                }
+            }
+        });
+    }
+
+    function exitSelectionMode() {
+        // Clear selection
+        selectedReportIds.clear();
+        updateDeleteButton();
+        document.querySelectorAll('.report-checkbox').forEach(cb => cb.checked = false);
+    }
+
+    // --------------------------------------------------------------------------
+    // Modal Logic
+    // --------------------------------------------------------------------------
+    const modal = document.getElementById('report-modal');
+    const modalView = document.getElementById('modal-view-mode');
+    const modalEdit = document.getElementById('modal-edit-form');
+
+    // Elements
+    const mInventory = document.getElementById('modal-inventory-name');
+    const mRemarks = document.getElementById('modal-remarks');
+    const mStatus = document.getElementById('modal-status');
+    const mDate = document.getElementById('modal-date');
+    const mImg = document.getElementById('modal-img');
+    const mActions = document.getElementById('modal-actions-submitted');
+
+    // Edit Form Elements
+    const eInventory = document.getElementById('edit-inventory-name');
+    const eRemarks = document.getElementById('edit-remarks');
+    let currentReportId = null;
+
+    const btnDelete = document.getElementById('btn-delete-report');
+    if (btnDelete) {
+        btnDelete.addEventListener('click', function () {
+            window.confirmDelete();
+        });
+    }
+
+    window.openReportModal = function (reportId) {
+        // Find report data
+        const card = document.querySelector(`.h-card[data-id="${reportId}"]`);
+        if (!card || !card.reportData) return;
+        const r = card.reportData;
+        currentReportId = r.id;
+
+        // Populate View
+        mInventory.textContent = r.inventory ? r.inventory.inventory_name : 'Deleted';
+        mRemarks.textContent = r.remarks;
+        mStatus.textContent = r.status_condition;
+        mDate.textContent = new Date(r.date_reported).toLocaleDateString();
+
+        if (r.evidence_photo) {
+            let src = r.evidence_photo;
+            console.log('DEBUG: Original photo path:', src); // Debug log
+            if (!src.startsWith('http')) {
+                const path = src.startsWith('/') ? src : `/${src}`;
+                src = CONFIG.apiUrl(path);
+            }
+            console.log('DEBUG: Final modal image src:', src); // Debug log
+            mImg.src = src;
+            mImg.style.display = 'block';
+        } else {
+            mImg.style.display = 'none';
+        }
+
+        // Show Actions (Delete) for EVERYONE
+        // Backend handles logic: Owner -> Hard Delete, Receiver -> Soft Delete (Hide)
+        mActions.style.display = 'flex';
+
+        modal.classList.add('show');
+        modalView.style.display = 'block';
+        modalEdit.style.display = 'none';
+    };
+
+    window.closeReportModal = function () {
+        modal.classList.remove('show');
+    };
+
+    // Close on overlay click
+    modal.addEventListener('click', function (e) {
+        if (e.target === modal) closeReportModal();
+    });
+    document.getElementById('modal-close-btn').addEventListener('click', closeReportModal);
+
+    // Delete Single
+    window.confirmDelete = function () {
+        if (!confirm('Delete this report?')) return;
+
+        $.ajax({
+            url: CONFIG.apiUrl(`/api/reports/${currentReportId}`),
+            method: 'DELETE',
+            success: function (res) {
+                alert('Report has been deleted.');
+                closeReportModal();
+                fetchReportsData();
+            },
+            error: function (xhr) {
+                // 401 handled globally
+                if (xhr.status !== 401) {
+                    alert('Delete failed: ' + (xhr.responseJSON?.message || 'Unknown error'));
+                }
+            }
+        });
+    };
+
+    // Store currentUser globally for logic
+    const originalRender = renderReports;
+    renderReports = function (data) {
+        window.currentUser = data.currentUser;
+        originalRender(data);
+    };
+
+    // Accordion Toggle Logic (Global for inline onclick)
+    window.toggleSection = function (containerId, headerEl) {
+        const container = document.getElementById(containerId);
+        const icon = headerEl.querySelector('.chevron-icon');
+
+        if (container.style.display === 'none') {
+            container.style.display = 'grid';
+            if (icon) icon.style.transform = 'rotate(0deg)';
+        } else {
+            container.style.display = 'none';
+            if (icon) icon.style.transform = 'rotate(-90deg)';
+        }
+    };
+
+});
