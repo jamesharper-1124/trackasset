@@ -224,7 +224,7 @@ body {
 
 
 /* =========================================
-   3. REPORTS PAGE DESIGN (Table Layout)
+   3. REPORTS PAGE DESIGN (Card Layout)
    ========================================= */
 
 /* Controls Bar */
@@ -355,76 +355,109 @@ body {
     font-size: 0.8rem;
 }
 
-/* Table Styles */
-.reports-section-wrapper {
-    padding-bottom: 40px;
+/* Reports List Container */
+.reports-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 
-.reports-table-container {
+/* Horizontal Card Style */
+.h-card {
+    display: flex;
+    align-items: center;
     background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    border: 1px solid #e2e8f0;
-    overflow-x: auto;
-    /* Enable horizontal scroll */
-}
-
-.reports-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 800px;
-    /* Force minimum width for table integrity */
-}
-
-.reports-table th,
-.reports-table td {
     padding: 16px;
-    text-align: left;
-    border-bottom: 1px solid #f1f5f9;
-    vertical-align: middle;
-}
-
-.reports-table th {
-    background-color: #f8fafc;
-    font-weight: 600;
-    color: #475569;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    white-space: nowrap;
-}
-
-.reports-table tr:last-child td {
-    border-bottom: none;
-}
-
-.reports-table tbody tr {
-    transition: background-color 0.2s;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid #e2e8f0;
+    gap: 16px;
+    position: relative;
     cursor: pointer;
 }
 
-.reports-table tbody tr:hover {
-    background-color: #f8fafc;
+.h-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    border-color: #6366f1;
 }
 
-/* Table Image */
-.report-table-img {
-    width: 48px;
-    height: 48px;
-    border-radius: 8px;
-    object-fit: cover;
+.h-card-img-wrapper {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: #f8fafc;
     border: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-/* Status Badge */
-.report-status-badge {
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 0.75rem;
+.h-card-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.h-card-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 0;
+}
+
+.h-card-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    padding-right: 12px;
+}
+
+.h-card-title {
+    font-size: 1rem;
     font-weight: 600;
-    white-space: nowrap;
+    color: #1e293b;
+    margin: 0;
 }
 
+.h-card-meta {
+    display: flex;
+    gap: 16px;
+    font-size: 0.85rem;
+    color: #64748b;
+    flex-wrap: wrap;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.h-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+/* Status Badge in Card */
+.card-status {
+    padding: 4px 10px;
+    border-radius: 9999px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Status Colors used in JS/HTML */
 .status-good {
     background-color: #d1fae5;
     color: #059669;
@@ -440,31 +473,12 @@ body {
     color: #dc2626;
 }
 
-/* Helpers */
-.text-truncate {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    color: #64748b;
-}
-
-.font-medium {
-    font-weight: 500;
-    color: #334155;
-}
-
-.no-image-text {
-    color: #94a3b8;
-    font-size: 0.8rem;
-    font-style: italic;
-}
-
-/* Checkbox Wrapper in TD/TH */
-.td-checkbox-wrapper,
-.th-checkbox-wrapper {
+/* Checkbox in Card */
+.card-checkbox-wrapper {
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
+    padding: 4px;
 }
 
 .report-checkbox {
@@ -480,9 +494,12 @@ body {
     text-align: center;
     color: #6b7280;
     font-style: italic;
+    background: white;
+    border-radius: 12px;
+    border: 1px dashed #e2e8f0;
 }
 
-/* Modal (reused from before, ensure it works) */
+/* Modal (reused) */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -597,13 +614,13 @@ body {
     }
 
     .search-input {
-        padding: 8px 10px 8px 36px;
+        padding: 8px 16px 8px 40px;
         font-size: 0.9rem;
         height: 40px;
     }
 
     .search-icon {
-        left: 10px;
+        left: 12px;
         width: 16px;
         height: 16px;
     }
@@ -614,7 +631,6 @@ body {
 
     .btn-primary.btn-add-report span {
         display: none;
-        /* Hide text on mobile */
     }
 
     .btn-primary.btn-add-report svg {
@@ -629,8 +645,46 @@ body {
         border-radius: 50%;
     }
 
-    /* Keep table horizontal scroll */
-    .reports-table-container {
-        border-radius: 8px;
+    /* Mobile Card Layout (Stacked or Grid) */
+    .h-card {
+        flex-direction: row;
+        /* Keep row but use grid if needed for very small screens */
+        padding: 12px;
+        gap: 12px;
+    }
+
+    @media (max-width: 480px) {
+
+        /* Like Inventory Card Mobile style */
+        .h-card {
+            display: grid;
+            grid-template-columns: 60px 1fr;
+            gap: 12px;
+            align-items: start;
+        }
+
+        .h-card-img-wrapper {
+            width: 60px;
+            height: 60px;
+        }
+
+        .h-card-content {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .h-card-info {
+            width: 100%;
+            padding-right: 0;
+        }
+
+        .h-card-actions {
+            width: 100%;
+            justify-content: space-between;
+            /* Status | Checkbox */
+            margin-top: 4px;
+        }
     }
 }
