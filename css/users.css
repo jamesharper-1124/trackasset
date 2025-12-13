@@ -107,28 +107,38 @@
     }
 }
 
-/* Global Button Icon Styles (Desktop Default) */
+/* --- UNIFIED BUTTON STYLES (SQUIRCLE) --- */
+/* Target ALL buttons: Top Actions, Card Actions, Fake buttons */
+.btn,
+.btn-primary,
+.btn-danger,
+
+.btn-edit,
+.btn-delete,
+.btn-icon,
+.fake-btn-icon,
+button[type="button"] {
+    border-radius: 12px !important;
+    /* Force Squircle */
+    border: none !important;
+    outline: none !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* Specific Sizes */
 .btn-icon,
 .fake-btn-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 2.5rem;
-    /* Increased from 2rem (32px) to 40px */
-    height: 2.5rem;
-    border-radius: 12px;
-    /* Squircle */
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.2s, color 0.2s, transform 0.1s;
-    outline: none;
+    width: 2.5rem !important;
+    /* Fixed Square size */
+    height: 2.5rem !important;
 }
 
-.btn-icon:active,
-.fake-btn-icon:active {
-    transform: scale(0.95);
-}
-
+/* Colors - Ensure they apply */
 .btn-edit {
     background-color: #eff6ff;
     color: #3b82f6;
@@ -140,15 +150,26 @@
 }
 
 .btn-delete,
-.btn-delete-safe {
+.btn-delete-safe,
+.btn-danger {
     background-color: #fef2f2;
     color: #ef4444;
 }
 
 .btn-delete:hover,
-.btn-delete-safe:hover {
+.btn-delete-safe:hover,
+.btn-danger:hover {
     background-color: #fee2e2;
     color: #dc2626;
+}
+
+.btn-primary {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #2563eb;
 }
 
 .btn-icon svg,
@@ -170,22 +191,22 @@
     gap: 1rem;
 }
 
-/* Main Top Buttons (Add User / Delete) */
+/* Text Buttons (Add User / Top Delete) override */
 .btn {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
     padding: 0.6rem 1.25rem;
-    /* Larger padding */
-    border-radius: 12px;
-    /* Squircle */
+    /* Text button padding */
     font-weight: 500;
     font-size: 0.9rem;
-    cursor: pointer;
-    border: none;
-    outline: none;
-    transition: all 0.2s;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    /* rounded-corners handled by global rule */
+}
+
+/* Ensure .btn-primary is applied if it wasn't already matched */
+.btn-primary {
+    background-color: #3b82f6;
+    color: white;
 }
 
 .btn svg {
