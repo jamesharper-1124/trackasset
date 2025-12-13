@@ -650,6 +650,11 @@ body {
 /* Mobile Layout (Optimized for 350px+) */
 @media (max-width: 768px) {
 
+    .content-area {
+        padding: 1rem;
+        /* Reduce padding from 2rem to 1rem */
+    }
+
     /* 1. Header Controls: Search | Delete | Plus */
     /* We use a single flex container. .action-buttons uses display: contents to let its children participate directly. */
     /* 1. Header Controls: Search | Delete | Plus */
@@ -690,29 +695,7 @@ body {
         /* Auto width */
     }
 
-    .search-input {
-        padding: 0 10px 0 36px;
-        font-size: 0.9rem;
-        height: 42px; /* Slightly taller */
-        width: 100%;
-    }
-
-    .search-icon {
-        left: 10px;
-        width: 16px;
-        height: 16px;
-    }
-
-    /* Container for buttons */
-    .action-buttons {
-        display: flex;
-        gap: 8px;
-        flex-shrink: 0;
-        /* Don't shrink */
-        align-items: center;
-        width: auto;
-        /* Auto width */
-    }
+    /* Removed duplicate blocks */
 
     /* Add Button (Square/Rect with Text) */
     .btn-add-report {
