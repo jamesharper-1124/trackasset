@@ -658,6 +658,26 @@ body {
         border-radius: 50%;
     }
 
+    /* Compact Delete Button for small screens */
+    @media (max-width: 480px) {
+        .btn-danger .btn-text {
+            display: none;
+        }
+
+        .btn-danger {
+            padding: 0;
+            width: 40px;
+            min-width: 40px;
+            height: 40px;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .btn-danger svg {
+            margin: 0 !important;
+        }
+    }
+
     /* Mobile Card Layout (Stacked or Grid) */
     .h-card {
         flex-direction: row;
