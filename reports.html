@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reports - TrackAsset</title>
     <!-- Link to custom CSS -->
-    <link rel="stylesheet" href="css/reports.css?v=10">
+    <link rel="stylesheet" href="css/reports.css?v=11">
     <link rel="stylesheet" href="css/dashboard.css?v=5">
     <link rel="stylesheet" href="css/users.css?v=4">
     <link rel="stylesheet" href="css/rooms.css?v=4">
@@ -155,11 +155,11 @@
                     </div>
                 </div>
 
-                <!-- Unified Reports Grid -->
-                <div class="reports-dashboard-grid" id="reports-grid">
+                <!-- Unified Reports Grid (Now Tables) -->
+                <div class="reports-section-wrapper">
 
                     <!-- 1. My Submitted Reports -->
-                    <div id="submitted-reports-section">
+                    <div id="submitted-reports-section" class="report-table-section">
                         <div class="section-title" id="submitted-toggle"
                             style="cursor: pointer; justify-content: space-between;">
                             <div style="display:flex; align-items:center; gap:8px;">
@@ -172,13 +172,35 @@
                                     d="M19 9l-7 7-7-7"></path>
                             </svg>
                         </div>
-                        <div id="submitted-reports-container" class="reports-column">
-                            <p class="empty-state">No reports submitted yet.</p>
+                        <div id="submitted-reports-container" class="reports-table-container">
+                            <table class="reports-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 40px;">
+                                            <div class="th-checkbox-wrapper">
+                                                <input type="checkbox" id="select-all-submitted">
+                                            </div>
+                                        </th>
+                                        <th>ID</th>
+                                        <th>Evidence</th>
+                                        <th>Inventory</th>
+                                        <th>Room</th>
+                                        <th>Remarks</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="submitted-table-body">
+                                    <!-- Rows populated by JS -->
+                                </tbody>
+                            </table>
+                            <p class="empty-state" id="submitted-empty-state" style="display:none;">No reports submitted
+                                yet.</p>
                         </div>
                     </div>
 
                     <!-- 2. Received / Available Reports -->
-                    <div id="received-reports-section">
+                    <div id="received-reports-section" class="report-table-section" style="margin-top: 2rem;">
                         <div class="section-title" id="received-toggle"
                             style="cursor: pointer; justify-content: space-between;">
                             <div style="display:flex; align-items:center; gap:8px;">
@@ -191,8 +213,31 @@
                                     d="M19 9l-7 7-7-7"></path>
                             </svg>
                         </div>
-                        <div id="received-reports-container" class="reports-column">
-                            <p class="empty-state">No reports available.</p>
+                        <div id="received-reports-container" class="reports-table-container">
+                            <table class="reports-table">
+                                <thead>
+                                    <tr>
+                                        <!-- No bulk delete for available reports usually, but keeping format consistent -->
+                                        <th style="width: 40px;">
+                                            <div class="th-checkbox-wrapper">
+                                                <input type="checkbox" id="select-all-received">
+                                            </div>
+                                        </th>
+                                        <th>ID</th>
+                                        <th>Evidence</th>
+                                        <th>Inventory</th>
+                                        <th>Room</th>
+                                        <th>Remarks</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="received-table-body">
+                                    <!-- Rows populated by JS -->
+                                </tbody>
+                            </table>
+                            <p class="empty-state" id="received-empty-state" style="display:none;">No reports available.
+                            </p>
                         </div>
                     </div>
 
