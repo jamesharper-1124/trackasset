@@ -35,8 +35,11 @@ document.addEventListener('DOMContentLoaded', function () {
             if (user.profile_photo_url || user.profile_photo) {
                 let photoUrl = user.profile_photo_url || user.profile_photo;
                 if (!photoUrl.startsWith('http')) {
-                    photoUrl = CONFIG.apiUrl(photoUrl);
+                    // Start of fix: Ensure leading slash for relative paths
+                    const path = photoUrl.startsWith('/') ? photoUrl : `/${photoUrl}`;
+                    photoUrl = CONFIG.apiUrl(path);
                 }
+
                 $('#preview-img').attr('src', photoUrl);
 
                 // Also update header image
