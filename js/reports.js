@@ -12,6 +12,58 @@ document.addEventListener('DOMContentLoaded', function () {
     let selectedReportIds = new Set();
     const btnDeleteText = document.getElementById('btn-delete-text');
 
+    // --------------------------------------------------------------------------
+    // Sidebar & Dropdown Logic (Redundant Safety)
+    // --------------------------------------------------------------------------
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const dropdownBtn = document.getElementById('dropdown-btn');
+    const dropdownMenu = document.getElementById('dropdown-menu');
+
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', function () {
+            console.log('Reports: Sidebar Toggle Clicked');
+            sidebar.classList.toggle('show');
+            sidebarOverlay.classList.toggle('show');
+        });
+    }
+    if (sidebarOverlay) {
+        sidebarOverlay.addEventListener('click', function () {
+            sidebar.classList.remove('show');
+            sidebarOverlay.classList.remove('show');
+        });
+    }
+    if (dropdownBtn) {
+        dropdownBtn.addEventListener('click', function (e) {
+            console.log('Reports: Dropdown Clicked');
+            e.stopPropagation();
+            if (dropdownMenu) dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+        });
+        document.addEventListener('click', function (e) {
+            if (dropdownMenu && !dropdownBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                dropdownMenu.style.display = 'none';
+            }
+        });
+    }
+
+    // --------------------------------------------------------------------------
+    // Accordion Logic (Attach Listeners)
+    // --------------------------------------------------------------------------
+    const submittedToggle = document.getElementById('submitted-toggle');
+    const receivedToggle = document.getElementById('received-toggle');
+
+    if (submittedToggle) {
+        submittedToggle.addEventListener('click', function () {
+            window.toggleSection('submitted-reports-container', this);
+        });
+    }
+    if (receivedToggle) {
+        receivedToggle.addEventListener('click', function () {
+            window.toggleSection('received-reports-container', this);
+        });
+    }
+
     // Initial Fetch
     fetchReportsData();
 
