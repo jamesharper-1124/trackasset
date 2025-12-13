@@ -42,7 +42,8 @@
     /* Prevents text overflow issues */
 }
 
-.user-name {
+.user-name,
+.card-user-name {
     font-size: 1rem;
     font-weight: 600;
     color: #111827;
@@ -75,6 +76,35 @@
     border: none;
     cursor: pointer;
     transition: background-color 0.2s, color 0.2s;
+}
+
+/* ... existing code ... */
+
+/* 
+   FIX: Mobile Name Display & Larger Delete Button 
+   Overriding global dashboard.css rules that hide .user-name 
+*/
+@media (max-width: 480px) {
+    .card-user-name {
+        display: block !important;
+        font-size: 1rem !important;
+        margin-bottom: 0.25rem;
+    }
+
+    /* Enlarge action buttons on mobile */
+    .user-actions .btn-icon {
+        width: 3.5rem !important;
+        /* 56px - Extra Large */
+        height: 3.5rem !important;
+        /* 56px */
+    }
+
+    .user-actions .btn-icon svg {
+        width: 1.75rem !important;
+        /* 28px */
+        height: 1.75rem !important;
+        /* 28px */
+    }
 }
 
 .fake-btn-icon {
@@ -176,4 +206,32 @@
     margin-bottom: 1rem;
     padding-bottom: 0.5rem;
     border-bottom: 2px solid #e5e7eb;
+}
+
+/* 
+   FIX: Mobile Name Display & Larger Delete Button 
+   Overriding global dashboard.css rules that hide .user-name 
+*/
+@media (max-width: 480px) {
+    .user-card .user-name {
+        display: block !important;
+        /* Force show name */
+        font-size: 1rem !important;
+        margin-bottom: 0.25rem;
+    }
+
+    /* Enlarge action buttons on mobile */
+    .user-actions .btn-icon {
+        width: 3rem !important;
+        /* 48px */
+        height: 3rem !important;
+        /* 48px */
+    }
+
+    .user-actions .btn-icon svg {
+        width: 1.5rem !important;
+        /* 24px */
+        height: 1.5rem !important;
+        /* 24px */
+    }
 }
