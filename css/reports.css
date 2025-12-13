@@ -661,24 +661,40 @@ body {
         flex-direction: row !important;
         /* Force Horizontal */
         align-items: center;
-        gap: 8px;
+        gap: 12px;
+        /* Increased gap */
         flex-wrap: nowrap !important;
         width: 100%;
+        padding: 0;
+        /* reset padding */
     }
 
     .search-wrapper {
         flex: 1;
         /* Take remaining space */
+        width: 100%;
+        /* Ensure it tries to fill */
         min-width: 0;
-        /* Allow shrinking */
+        /* Allow shrinking if absolutely necessary but prefer growing */
         max-width: none;
     }
 
+    /* Container for buttons */
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+        flex-shrink: 0;
+        /* Don't shrink */
+        align-items: center;
+        width: auto;
+        /* Auto width */
+    }
+
     .search-input {
-        padding: 8px 10px 8px 36px;
+        padding: 0 10px 0 36px;
         font-size: 0.9rem;
-        height: 40px;
-        /* Match button height */
+        height: 42px; /* Slightly taller */
+        width: 100%;
     }
 
     .search-icon {
@@ -704,13 +720,15 @@ body {
         align-items: center;
         justify-content: center;
         width: auto !important;
-        height: 40px !important;
+        height: 42px !important;
+        /* Match search height */
         padding: 0 16px !important;
         border-radius: 8px !important;
-        /* Square-ish with rounded corners */
         text-decoration: none;
         flex: 0 0 auto !important;
         order: 3;
+        font-size: 0.9rem;
+        white-space: nowrap;
     }
 
     .btn-add-report span {
