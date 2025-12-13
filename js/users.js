@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function () {
         card.dataset.id = user.id;
 
         // Image handling with CONFIG.apiUrl
-        let photoUrl = 'images/default-avatar.png'; // Default fallback
+        let photoUrl = 'images/profile_pic/default.png'; // Corrected default fallback
         if (user.profile_photo) {
             let src = user.profile_photo;
             if (!src.startsWith('http')) {
@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Avatar
         const avatarHtml = `
             <div class="user-avatar">
-                <img src="${photoUrl}" alt="${user.firstname}" onerror="this.src='images/default-avatar.png'">
+                <img src="${photoUrl}" alt="${user.firstname}" onerror="this.src='images/profile_pic/default.png'">
             </div>
         `;
 
