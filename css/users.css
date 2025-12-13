@@ -3,9 +3,11 @@
 /* Grid Layout */
 .users-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 16px;
     margin-bottom: 32px;
+    justify-content: start;
+    /* Align grid items to start */
 }
 
 /* User Card Styles */
@@ -105,60 +107,17 @@
 .user-actions {
     display: flex;
     gap: 8px;
-    /* Closer gap */
-    justify-content: flex-end;
-    width: auto;
-    padding-top: 0;
-    border-top: none;
-    margin-left: 12px;
-}
-
-.btn-icon {
-    width: 32px;
-    /* Standard icon size */
-    height: 32px;
-    border-radius: 50%;
-    /* Circular as per schematic */
-    border: none;
-    display: flex;
     align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    padding: 0;
+    justify-content: flex-end;
+    margin-left: auto;
+    /* Push to right */
 }
 
-.btn-edit {
-    background-color: #3b82f6;
-    /* Blue circle */
-    color: white;
-}
-
-.btn-edit:hover {
-    background-color: #2563eb;
-    color: white;
-}
-
-.btn-delete {
-    background-color: #ef4444;
-    /* Red circle */
-    color: white;
-}
-
-.btn-delete:hover {
-    background-color: #dc2626;
-    color: white;
-}
-
-.btn-disabled {
-    background-color: #e5e7eb;
-    color: #9ca3af;
-    cursor: not-allowed;
-}
-
-.btn-icon svg {
-    width: 18px;
-    height: 18px;
+/* Ensure buttons don't shrink */
+.btn-icon {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
 }
 
 .btn-disabled {
@@ -332,77 +291,38 @@
 /* Mobile Responsive */
 @media (max-width: 768px) {
     .users-grid {
-        grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
-        /* Full width on mobile */
+        grid-template-columns: 1fr;
+        /* Full width */
     }
 
     .user-card {
-        flex-direction: row;
-        /* Horizontal on mobile for better stacking? OR keep grid? */
-        /* Let's keep it vertical but responsive, maybe horizontal card like inventory if requested later.
-           For now, stick to the card design but let it fill width. */
-        align-items: center;
-        text-align: left;
-        gap: 16px;
+        padding: 12px;
     }
 
     .user-avatar {
-        margin-bottom: 0;
-        width: 60px;
-        height: 60px;
-        flex-shrink: 0;
-    }
-
-    .user-info {
-        flex: 1;
-        margin-bottom: 0;
+        width: 48px;
+        height: 48px;
+        margin-right: 12px;
     }
 
     .user-actions {
-        width: auto;
-        flex-direction: column;
-        gap: 8px;
-        border-top: none;
-        padding-top: 0;
-        border-left: 1px solid #f1f5f9;
-        padding-left: 12px;
+        /* Keep horizontal on mobile too if space permits, or wrap if very small */
+        /* User wants horizontal ID and buttons. */
+        margin-left: auto;
+        gap: 6px;
     }
 
-    .btn-icon {
-        width: 32px;
-        height: 32px;
-    }
+    /* Ensure 350px support */
+    @media (max-width: 380px) {
+        .user-card {
+            flex-wrap: wrap;
+        }
 
-    .card-checkbox-wrapper {
-        position: static;
-        margin-right: 8px;
-    }
-
-    /* Controls Bar Mobile */
-    .controls-bar {
-        flex-direction: column !important;
-        align-items: stretch !important;
-        gap: 12px;
-    }
-
-    .search-wrapper {
-        width: 100%;
-        max-width: none;
-    }
-
-    .action-buttons {
-        width: 100%;
-        gap: 8px;
-    }
-
-    .btn-primary.btn-add-user {
-        flex: 1;
-        justify-content: center;
-        width: auto;
-    }
-
-    .btn-danger {
-        flex: 1;
-        justify-content: center;
+        .user-actions {
+            margin-left: 0;
+            margin-top: 8px;
+            width: 100%;
+            justify-content: flex-end;
+        }
     }
 }
