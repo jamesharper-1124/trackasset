@@ -10,7 +10,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const previewName = document.getElementById('preview-name');
     const previewRoom = document.getElementById('preview-room');
     const previewStatus = document.getElementById('preview-status');
-    const searchUrl = searchInput ? searchInput.dataset.searchUrl : null;
+    // Use CONFIG for search URL
+    const searchUrl = CONFIG.apiUrl('/ajax/inventories/search');
 
     // Helper: Resolve Image URL (matches inventories.js logic)
     function resolveImageUrl(photoPath) {
@@ -76,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!token) {
                 alert('Session Expired. Please log in again.');
                 localStorage.removeItem('auth_token');
-                window.location.href = '/login';
+                window.location.href = 'login.html';
                 return;
             }
 
@@ -87,18 +88,15 @@ document.addEventListener('DOMContentLoaded', function () {
             const formData = new FormData(this);
 
             $.ajax({
-                url: $(this).attr('action'),
+                url: CONFIG.apiUrl('/api/reports'), // Use fixed API endpoint
                 method: 'POST',
                 data: formData,
                 processData: false,
                 contentType: false,
                 success: function (response) {
                     alert('Report has been submitted. We will come back to you shortly after we diagnosed the problem');
-                    if (response.redirect) {
-                        window.location.href = response.redirect;
-                    } else {
-                        window.location.href = '/reports';
-                    }
+                    // Always redirect to reports.html (static)
+                    window.location.href = 'reports.html';
                 },
                 error: function (xhr) {
                     $btn.prop('disabled', false).text(originalText);
