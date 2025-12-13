@@ -657,12 +657,11 @@ body {
     .controls-bar {
         display: flex;
         flex-direction: row;
-        /* Horizontal row */
         align-items: center;
-        gap: 6px;
-        /* Tighter gap */
+        gap: 8px;
+        /* Slightly more gap */
         flex-wrap: nowrap;
-        /* FORCE single row */
+        width: 100%;
     }
 
     .search-wrapper {
@@ -692,21 +691,19 @@ body {
     /* Order: Search (1) -> Delete (2) -> Plus (3) */
     .search-wrapper {
         order: 1;
+        flex: 1 1 auto;
+        /* Grow and shrink */
+        min-width: 0;
+        /* Allow shrinking below content size */
     }
 
     /* Delete Button - Only visible when needed */
     #btn-delete-selected {
         flex: 0 0 auto;
-        /* Do not grow, do not shrink */
         white-space: nowrap;
         font-size: 0.75rem;
-        /* Smaller text */
         padding: 8px 10px;
-        /* Compact padding */
         order: 2;
-        /* After Search */
-
-        /* Aesthetic Polish */
         border-radius: 8px;
         background: #ef4444;
         color: white;
@@ -717,14 +714,19 @@ body {
     /* Add Button (+) */
     .btn-primary.btn-icon-only {
         flex: 0 0 40px;
-        /* Fixed size, no grow/shrink */
-        height: 40px;
+        /* Fixed 40px width */
         width: 40px;
+        /* Fixed 40px width */
+        height: 40px;
+        /* Fixed 40px height */
         order: 3;
-        border-radius: 10px;
-        /* Rounded rect on mobile usually looks better, or keep circle? User has circle on desktop. Let's keep consistency or user pref. keeping radius 10px from previous mobile style, but arguably 50% is better for 'plus' icon consistency. Let's try to match desktop style actually. */
         border-radius: 50%;
         box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
+        padding: 0;
+        /* Important to center icon */
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     /* Make delete button icon-only on very small screens if needed, 
