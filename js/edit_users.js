@@ -1,69 +1,145 @@
-$(document).ready(function () {
+document.addEventListener('DOMContentLoaded', function () {
     console.log('Edit Users Script Loaded');
 
-    const form = $('form[data-mode="edit"]');
+    // 1. Get User ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const userId = urlParams.get('id');
 
-    if (form.length > 0) {
-        form.on('submit', function (e) {
+    if (!userId) {
+        alert('No user ID specified.');
+        window.location.href = 'users.html';
+        return;
+    }
+
+    const form = document.getElementById('edit-user-form');
+    const token = localStorage.getItem('auth_token');
+
+    if (!token) {
+        window.location.href = 'login.html';
+        return;
+    }
+
+    // 2. Fetch User Data
+    if (form) {
+        // Set Action URL dynamically
+        const apiUrl = CONFIG.apiUrl('/api/users/' + userId);
+        form.setAttribute('action', apiUrl);
+
+        // Fetch Data
+        $.ajax({
+            url: apiUrl,
+            method: 'GET',
+            headers: { 'Authorization': 'Bearer ' + token },
+            success: function (data) {
+                const user = data.user || data; // Handle {user: ...} or direct object
+                console.log('User fetched:', user);
+
+                // Populate Inputs
+                $('input[name="firstname"]').val(user.firstname);
+                $('input[name="lastname"]').val(user.lastname);
+                $('input[name="email"]').val(user.email);
+                $('input[name="username"]').val(user.username);
+                $('input[name="phone"]').val(user.phone);
+                $('input[name="address"]').val(user.address);
+                $('select[name="role"]').val(user.role);
+
+                // Handle Profile Photo Preview
+                if (user.profile_photo_url) {
+                    let photoUrl = user.profile_photo_url;
+                    if (!photoUrl.startsWith('http')) {
+                        photoUrl = CONFIG.apiUrl(photoUrl);
+                    }
+                    $('#preview-img').attr('src', photoUrl);
+                }
+            },
+            error: function (err) {
+                console.error('Fetch error:', err);
+                alert('Failed to load user data.');
+                window.location.href = 'users.html';
+            }
+        });
+
+        // 3. Handle Submission
+        form.addEventListener('submit', function (e) {
             e.preventDefault();
-            console.log('Form submission intercepted');
+            console.log('Submitting update...');
 
-            const token = localStorage.getItem('auth_token');
-            if (!token) {
-                alert('Authentication token missing. Please login again.');
-                window.location.href = '/login';
-                return;
-            }
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Updating...';
 
-            const userId = form.data('id');
             const formData = new FormData(this);
+            formData.append('_method', 'PUT'); // Laravel requirement
 
-            // Spoof PUT method for Laravel
-            formData.append('_method', 'PUT');
-
-            // Log data for debugging (excluding sensitive stuff generally, but helpful here)
-            for (var pair of formData.entries()) {
-                console.log(pair[0] + ', ' + pair[1]);
-            }
+            // Handle Image Compression (Optional but good)
+            // For now, simpler direct send to match add_users if possible, but let's stick to basics first
 
             $.ajax({
-                url: $(this).attr('action'), // Use the form's action attribute (e.g. /api/users/{id})
-                type: 'POST', // POST with _method: PUT
+                url: apiUrl,
+                method: 'POST', // POST with _method=PUT
                 data: formData,
-                headers: {
-                    'Authorization': 'Bearer ' + token,
-                    'Accept': 'application/json'
-                },
                 processData: false,
                 contentType: false,
+                headers: { 'Authorization': 'Bearer ' + token },
                 success: function (response) {
-                    console.log('Update success:', response);
-                    if (response.redirect) {
-                        alert('User updated successfully');
-                        window.location.href = response.redirect;
-                    } else {
-                        alert('User updated successfully');
-                        window.location.href = '/users';
-                    }
+                    alert('User updated successfully.');
+                    window.location.href = 'users.html'; // Force Local Redirect
                 },
                 error: function (xhr) {
-                    console.error('Update error:', xhr);
-                    let errorMsg = 'An error occurred during the update.';
-
-                    if (xhr.status === 401) {
-                        errorMsg = 'Session expired. Please login again.';
-                        window.location.href = '/login';
-                    } else if (xhr.responseJSON && xhr.responseJSON.message) {
-                        errorMsg = xhr.responseJSON.message;
-                    } else if (xhr.responseJSON && xhr.responseJSON.errors) {
-                        // Collect validation errors
-                        let errors = Object.values(xhr.responseJSON.errors).flat();
-                        errorMsg = 'Validation Error:\n' + errors.join('\n');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalBtnText;
+                    let msg = 'Update failed.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        msg += ' ' + xhr.responseJSON.message;
                     }
-
-                    alert(errorMsg);
+                    alert(msg);
                 }
             });
         });
     }
+
+    // Sidebar & Dropdown Toggles (Copied from generic scripts)
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const dropdownBtn = document.getElementById('dropdown-btn');
+    const dropdownMenu = document.getElementById('dropdown-menu');
+
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', function () {
+            sidebar.classList.toggle('show');
+            sidebarOverlay.classList.toggle('show');
+        });
+    }
+
+    if (sidebarOverlay) {
+        sidebarOverlay.addEventListener('click', function () {
+            sidebar.classList.remove('show');
+            sidebarOverlay.classList.remove('show');
+        });
+    }
+
+    if (dropdownBtn && dropdownMenu) {
+        dropdownBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+        });
+        document.addEventListener('click', function (e) {
+            if (!dropdownBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                dropdownMenu.style.display = 'none';
+            }
+        });
+    }
 });
+
+// Global Preview Function
+function previewImage(input) {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            document.getElementById('preview-img').src = e.target.result;
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
