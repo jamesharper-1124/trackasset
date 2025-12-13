@@ -268,7 +268,12 @@ document.addEventListener('DOMContentLoaded', function () {
         mDate.textContent = new Date(r.date_reported).toLocaleDateString();
 
         if (r.evidence_photo) {
-            mImg.src = `/${r.evidence_photo}`;
+            let src = r.evidence_photo;
+            if (!src.startsWith('http')) {
+                const path = src.startsWith('/') ? src : `/${src}`;
+                src = CONFIG.apiUrl(path);
+            }
+            mImg.src = src;
             mImg.style.display = 'block';
         } else {
             mImg.style.display = 'none';
