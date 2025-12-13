@@ -204,18 +204,13 @@
                                         <input type="password" name="password" class="form-input" required>
                                     </div>
                                     <div>
-                                        <label class="form-label">Confirm Password</label>
-                                        <input type="password" name="password_confirmation" class="form-input" required>
+                                        <label class="form-label">Role</label>
+                                        <select name="role" class="form-select" required>
+                                            <option value="user" selected>User</option>
+                                            <option value="staff">Staff</option>
+                                            <option value="admin">Admin</option>
+                                        </select>
                                     </div>
-                                </div>
-
-                                <div>
-                                    <label class="form-label">Role</label>
-                                    <select name="role" class="form-select" required>
-                                        <option value="user" selected>User</option>
-                                        <option value="staff">Staff</option>
-                                        <option value="admin">Admin</option>
-                                    </select>
                                 </div>
                             </div>
                         </div>
