@@ -155,52 +155,40 @@
                     </div>
                 </div>
 
-                <!-- Unified Reports Grid (Now Tables) -->
+                <!-- Unified Reports Grid (Cards) -->
                 <div class="reports-section-wrapper">
 
                     <!-- 1. My Submitted Reports -->
-                    <div id="submitted-reports-section" class="report-table-section">
+                    <div id="submitted-reports-section" class="report-section">
                         <div class="section-title" id="submitted-toggle"
                             style="cursor: pointer; justify-content: space-between;">
                             <div style="display:flex; align-items:center; gap:8px;">
                                 My Submitted Reports
                                 <span class="section-count" id="submitted-count">0</span>
                             </div>
-                            <svg class="chevron-icon" width="20" height="20" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24" style="transition: transform 0.2s;">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M19 9l-7 7-7-7"></path>
-                            </svg>
+
+                            <!-- Bulk Select for Submitted -->
+                            <div style="display:flex; align-items:center; gap:8px;" onclick="event.stopPropagation()">
+                                <label
+                                    style="font-size: 0.85rem; color: #6b7280; display:flex; align-items:center; gap:4px; cursor:pointer; margin-right: 8px;">
+                                    <input type="checkbox" id="select-all-submitted"> Select All
+                                </label>
+                                <svg class="chevron-icon" width="20" height="20" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24" style="transition: transform 0.2s;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </div>
                         </div>
-                        <div id="submitted-reports-container" class="reports-table-container">
-                            <table class="reports-table">
-                                <thead>
-                                    <tr>
-                                        <th style="width: 40px;">
-                                            <div class="th-checkbox-wrapper">
-                                                <input type="checkbox" id="select-all-submitted">
-                                            </div>
-                                        </th>
-                                        <th>ID</th>
-                                        <th>Evidence</th>
-                                        <th>Inventory</th>
-                                        <th>Room</th>
-                                        <th>Remarks</th>
-                                        <th>Status</th>
-                                        <th>Date</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="submitted-table-body">
-                                    <!-- Rows populated by JS -->
-                                </tbody>
-                            </table>
+                        <div id="submitted-reports-container" class="reports-list">
+                            <!-- Cards populated by JS -->
                             <p class="empty-state" id="submitted-empty-state" style="display:none;">No reports submitted
                                 yet.</p>
                         </div>
                     </div>
 
                     <!-- 2. Received / Available Reports -->
-                    <div id="received-reports-section" class="report-table-section" style="margin-top: 2rem;">
+                    <div id="received-reports-section" class="report-section" style="margin-top: 2rem;">
                         <div class="section-title" id="received-toggle"
                             style="cursor: pointer; justify-content: space-between;">
                             <div style="display:flex; align-items:center; gap:8px;">
@@ -213,29 +201,8 @@
                                     d="M19 9l-7 7-7-7"></path>
                             </svg>
                         </div>
-                        <div id="received-reports-container" class="reports-table-container">
-                            <table class="reports-table">
-                                <thead>
-                                    <tr>
-                                        <!-- No bulk delete for available reports usually, but keeping format consistent -->
-                                        <th style="width: 40px;">
-                                            <div class="th-checkbox-wrapper">
-                                                <input type="checkbox" id="select-all-received">
-                                            </div>
-                                        </th>
-                                        <th>ID</th>
-                                        <th>Evidence</th>
-                                        <th>Inventory</th>
-                                        <th>Room</th>
-                                        <th>Remarks</th>
-                                        <th>Status</th>
-                                        <th>Date</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="received-table-body">
-                                    <!-- Rows populated by JS -->
-                                </tbody>
-                            </table>
+                        <div id="received-reports-container" class="reports-list">
+                            <!-- Cards populated by JS -->
                             <p class="empty-state" id="received-empty-state" style="display:none;">No reports available.
                             </p>
                         </div>
