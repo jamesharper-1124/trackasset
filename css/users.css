@@ -45,7 +45,7 @@
 .user-name,
 .card-user-name {
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 500;
     color: #111827;
     margin: 0;
     white-space: nowrap;
@@ -208,30 +208,37 @@
     border-bottom: 2px solid #e5e7eb;
 }
 
+/* Header Profile Name Override (Make it slightly smaller) */
+.header-right .user-name {
+    font-size: 0.85rem !important;
+}
+
 /* 
    FIX: Mobile Name Display & Larger Delete Button 
    Overriding global dashboard.css rules that hide .user-name 
 */
 @media (max-width: 480px) {
-    .user-card .user-name {
+    .card-user-name {
         display: block !important;
-        /* Force show name */
-        font-size: 1rem !important;
+        font-size: 0.95rem !important;
+        /* Slightly smaller than 1rem */
+        font-weight: 500 !important;
+        /* Not bold */
         margin-bottom: 0.25rem;
     }
 
-    /* Enlarge action buttons on mobile */
+    /* Enlarge action buttons on mobile (Refined size) */
     .user-actions .btn-icon {
-        width: 3rem !important;
-        /* 48px */
-        height: 3rem !important;
-        /* 48px */
+        width: 2.75rem !important;
+        /* 44px (Smaller than 56px, bigger than 32px) */
+        height: 2.75rem !important;
+        /* 44px */
     }
 
     .user-actions .btn-icon svg {
-        width: 1.5rem !important;
-        /* 24px */
-        height: 1.5rem !important;
-        /* 24px */
+        width: 1.35rem !important;
+        /* ~22px */
+        height: 1.35rem !important;
+        /* ~22px */
     }
 }
