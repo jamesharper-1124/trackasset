@@ -35,46 +35,54 @@ document.addEventListener('DOMContentLoaded', function () {
         const { submittedReports, receivedReports, currentUser } = data;
 
         // Submitted Reports
-        const submittedTbody = document.getElementById('submitted-table-body');
+        const submittedContainer = document.getElementById('submitted-reports-container');
         const submittedEmpty = document.getElementById('submitted-empty-state');
         const submittedCountEl = document.getElementById('submitted-count');
 
         submittedCountEl.textContent = submittedReports ? submittedReports.length : 0;
-        submittedTbody.innerHTML = '';
+
+        // Remove old content but keep empty state element
+        Array.from(submittedContainer.children).forEach(child => {
+            if (child.id !== 'submitted-empty-state') submittedContainer.removeChild(child);
+        });
 
         if (submittedReports && submittedReports.length > 0) {
             submittedEmpty.style.display = 'none';
             submittedReports.forEach(report => {
-                submittedTbody.appendChild(createReportRow(report, currentUser, true));
+                submittedContainer.appendChild(createReportCard(report, currentUser, true));
             });
         } else {
             submittedEmpty.style.display = 'block';
         }
 
         // Received Reports
-        const receivedTbody = document.getElementById('received-table-body');
+        const receivedContainer = document.getElementById('received-reports-container');
         const receivedEmpty = document.getElementById('received-empty-state');
         const receivedCountEl = document.getElementById('received-count');
 
         receivedCountEl.textContent = receivedReports ? receivedReports.length : 0;
-        receivedTbody.innerHTML = '';
+        // Remove old content but keep empty state element
+        Array.from(receivedContainer.children).forEach(child => {
+            if (child.id !== 'received-empty-state') receivedContainer.removeChild(child);
+        });
 
         if (receivedReports && receivedReports.length > 0) {
             receivedEmpty.style.display = 'none';
             receivedReports.forEach(report => {
-                receivedTbody.appendChild(createReportRow(report, currentUser, false));
+                receivedContainer.appendChild(createReportCard(report, currentUser, false));
             });
         } else {
             receivedEmpty.style.display = 'block';
         }
     }
 
-    function createReportRow(report, currentUser, isSubmitted) {
-        const tr = document.createElement('tr');
-        tr.dataset.id = report.id;
+    function createReportCard(report, currentUser, isSubmitted) {
+        const card = document.createElement('div');
+        card.className = 'h-card'; // Use horizontal card style
+        card.dataset.id = report.id;
 
         // Store Full Object for Modal functionality
-        tr.reportData = report;
+        card.reportData = report;
 
         const photoUrl = report.evidence_photo ? `/${report.evidence_photo}` : null;
         const inventoryName = report.inventory ? report.inventory.inventory_name : 'Deleted Inventory';
@@ -83,13 +91,13 @@ document.addEventListener('DOMContentLoaded', function () {
             year: 'numeric', month: 'short', day: 'numeric'
         });
 
-        // Image Cell
+        // Image Section
         let imageHtml = '';
         if (photoUrl) {
             const fullPhotoUrl = photoUrl.startsWith('http') ? photoUrl : CONFIG.apiUrl(photoUrl);
-            imageHtml = `<img src="${fullPhotoUrl}" alt="Img" class="report-table-img">`;
+            imageHtml = `<img src="${fullPhotoUrl}" alt="Details">`;
         } else {
-            imageHtml = `<span class="no-image-text">-</span>`;
+            imageHtml = `<span style="font-size:0.7rem; color:#9ca3af;">No Img</span>`;
         }
 
         // Status Badge Logic
@@ -98,30 +106,41 @@ document.addEventListener('DOMContentLoaded', function () {
         if (statusText === 'NEEDS ATTENTION') statusClass = 'status-fair';
         if (statusText === 'N.G') statusClass = 'status-danger';
 
-        tr.innerHTML = `
-            <td>
-                <div class="td-checkbox-wrapper" onclick="event.stopPropagation()">
-                    <input type="checkbox" class="report-checkbox" value="${report.id}">
-                </div>
-            </td>
-            <td>#${report.id}</td>
-            <td>${imageHtml}</td>
-            <td class="font-medium">${inventoryName}</td>
-            <td>${roomName}</td>
-            <td class="text-truncate" style="max-width: 200px;" title="${report.remarks}">${report.remarks}</td>
-            <td><span class="report-status-badge ${statusClass}">${statusText}</span></td>
-            <td>${dateStr}</td>
+        // Checkbox HTML
+        const checkboxHtml = `
+            <div class="card-checkbox-wrapper" onclick="event.stopPropagation()">
+                <input type="checkbox" class="report-checkbox" value="${report.id}">
+            </div>
         `;
 
-        // Click row to open modal (except when clicking checkbox)
-        tr.addEventListener('click', function (e) {
-            // Check if click was on checkbox or its wrapper
-            if (!e.target.closest('.report-checkbox') && !e.target.closest('.td-checkbox-wrapper')) {
-                openReportModal(report.id);
-            }
-        });
+        card.innerHTML = `
+            <div class="h-card-img-wrapper" onclick="openReportModal('${report.id}')">
+                ${imageHtml}
+            </div>
+            
+            <div class="h-card-content" onclick="openReportModal('${report.id}')">
+                <div class="h-card-info">
+                    <h4 class="h-card-title">${inventoryName}</h4>
+                    <div class="h-card-meta">
+                        <span class="meta-item">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                            ${roomName}
+                        </span>
+                        <span class="meta-item">
+                           <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                           ${dateStr}
+                        </span>
+                    </div>
+                </div>
 
-        return tr;
+                <div class="h-card-actions">
+                     <span class="card-status ${statusClass}">${statusText}</span>
+                     ${checkboxHtml}
+                </div>
+            </div>
+        `;
+
+        return card;
     }
 
     // --------------------------------------------------------------------------
@@ -132,28 +151,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Select All Checkboxes
     const selectAllSubmitted = document.getElementById('select-all-submitted');
-    const selectAllReceived = document.getElementById('select-all-received');
 
     if (selectAllSubmitted) {
         selectAllSubmitted.addEventListener('change', function () {
             const isChecked = this.checked;
             // Only select visible checkboxes in submitted table
-            const checkboxes = document.querySelectorAll('#submitted-table-body .report-checkbox');
-            checkboxes.forEach(cb => {
-                cb.checked = isChecked;
-                const id = parseInt(cb.value);
-                if (isChecked) selectedReportIds.add(id);
-                else selectedReportIds.delete(id);
-            });
-            updateDeleteButton();
-        });
-    }
-
-    if (selectAllReceived) {
-        selectAllReceived.addEventListener('change', function () {
-            const isChecked = this.checked;
-            // Only select visible checkboxes in received table
-            const checkboxes = document.querySelectorAll('#received-table-body .report-checkbox');
+            const checkboxes = document.querySelectorAll('#submitted-reports-container .report-checkbox');
             checkboxes.forEach(cb => {
                 cb.checked = isChecked;
                 const id = parseInt(cb.value);
@@ -253,9 +256,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     window.openReportModal = function (reportId) {
         // Find report data
-        const row = document.querySelector(`tr[data-id="${reportId}"]`);
-        if (!row || !row.reportData) return;
-        const r = row.reportData;
+        const card = document.querySelector(`.h-card[data-id="${reportId}"]`);
+        if (!card || !card.reportData) return;
+        const r = card.reportData;
         currentReportId = r.id;
 
         // Populate View
