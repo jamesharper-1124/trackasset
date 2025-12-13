@@ -35,42 +35,46 @@ document.addEventListener('DOMContentLoaded', function () {
         const { submittedReports, receivedReports, currentUser } = data;
 
         // Submitted Reports
-        const submittedSection = document.getElementById('submitted-reports-section');
-        const submittedContainer = document.getElementById('submitted-reports-container');
+        const submittedTbody = document.getElementById('submitted-table-body');
+        const submittedEmpty = document.getElementById('submitted-empty-state');
         const submittedCountEl = document.getElementById('submitted-count');
 
         submittedCountEl.textContent = submittedReports ? submittedReports.length : 0;
-        submittedContainer.innerHTML = '';
+        submittedTbody.innerHTML = '';
 
         if (submittedReports && submittedReports.length > 0) {
+            submittedEmpty.style.display = 'none';
             submittedReports.forEach(report => {
-                submittedContainer.appendChild(createReportCard(report, currentUser, true));
+                submittedTbody.appendChild(createReportRow(report, currentUser, true));
             });
         } else {
-            submittedContainer.innerHTML = '<p class="empty-state" style="color: #6b7280; font-style: italic; padding: 1rem;">No reports submitted yet.</p>';
+            submittedEmpty.style.display = 'block';
         }
 
         // Received Reports
-        const receivedSection = document.getElementById('received-reports-section');
-        const receivedContainer = document.getElementById('received-reports-container');
+        const receivedTbody = document.getElementById('received-table-body');
+        const receivedEmpty = document.getElementById('received-empty-state');
         const receivedCountEl = document.getElementById('received-count');
 
         receivedCountEl.textContent = receivedReports ? receivedReports.length : 0;
-        receivedContainer.innerHTML = '';
+        receivedTbody.innerHTML = '';
 
         if (receivedReports && receivedReports.length > 0) {
+            receivedEmpty.style.display = 'none';
             receivedReports.forEach(report => {
-                receivedContainer.appendChild(createReportCard(report, currentUser, false));
+                receivedTbody.appendChild(createReportRow(report, currentUser, false));
             });
         } else {
-            receivedContainer.innerHTML = '<p class="empty-state" style="color: #6b7280; font-style: italic; padding: 1rem;">No reports available.</p>';
+            receivedEmpty.style.display = 'block';
         }
     }
 
-    function createReportCard(report, currentUser, isSubmitted) {
-        const card = document.createElement('div');
-        card.className = 'report-card';
-        card.dataset.id = report.id;
+    function createReportRow(report, currentUser, isSubmitted) {
+        const tr = document.createElement('tr');
+        tr.dataset.id = report.id;
+
+        // Store Full Object for Modal functionality
+        tr.reportData = report;
 
         const photoUrl = report.evidence_photo ? `/${report.evidence_photo}` : null;
         const inventoryName = report.inventory ? report.inventory.inventory_name : 'Deleted Inventory';
@@ -79,21 +83,13 @@ document.addEventListener('DOMContentLoaded', function () {
             year: 'numeric', month: 'short', day: 'numeric'
         });
 
-        // Checkbox (Always Visible)
-        const checkboxHtml = `
-            <div class="card-checkbox-wrapper">
-                <input type="checkbox" class="report-checkbox" value="${report.id}">
-            </div>
-        `;
-
-        // Image Section
+        // Image Cell
         let imageHtml = '';
         if (photoUrl) {
-            // Fix: Use CONFIG.apiUrl if it's not a full URL
             const fullPhotoUrl = photoUrl.startsWith('http') ? photoUrl : CONFIG.apiUrl(photoUrl);
-            imageHtml = `<img src="${fullPhotoUrl}" alt="Evidence" class="report-img">`;
+            imageHtml = `<img src="${fullPhotoUrl}" alt="Img" class="report-table-img">`;
         } else {
-            imageHtml = `<div class="no-image-placeholder">No Image</div>`;
+            imageHtml = `<span class="no-image-text">-</span>`;
         }
 
         // Status Badge Logic
@@ -102,46 +98,71 @@ document.addEventListener('DOMContentLoaded', function () {
         if (statusText === 'NEEDS ATTENTION') statusClass = 'status-fair';
         if (statusText === 'N.G') statusClass = 'status-danger';
 
-        card.innerHTML = `
-            ${checkboxHtml}
-            
-            <div class="report-card-body" onclick="openReportModal('${report.id}')">
-                <div class="report-card-image-wrapper">
-                    ${imageHtml}
+        tr.innerHTML = `
+            <td>
+                <div class="td-checkbox-wrapper" onclick="event.stopPropagation()">
+                    <input type="checkbox" class="report-checkbox" value="${report.id}">
                 </div>
-
-                <div class="report-card-content">
-                    <div class="report-header">
-                         <div class="report-meta-top">
-                            <span class="report-id">#${report.id}</span>
-                            <span class="report-date">${dateStr}</span>
-                        </div>
-                        <h4 class="report-inv-name">${inventoryName}</h4>
-                        <span class="report-room">${roomName}</span>
-                    </div>
-                    
-                    <div class="report-body-preview">
-                        <span class="report-remarks">"${report.remarks}"</span>
-                    </div>
-
-                    <div class="report-footer">
-                        <span class="report-status ${statusClass}">${report.status_condition}</span>
-                    </div>
-                </div>
-            </div>
+            </td>
+            <td>#${report.id}</td>
+            <td>${imageHtml}</td>
+            <td class="font-medium">${inventoryName}</td>
+            <td>${roomName}</td>
+            <td class="text-truncate" style="max-width: 200px;" title="${report.remarks}">${report.remarks}</td>
+            <td><span class="report-status-badge ${statusClass}">${statusText}</span></td>
+            <td>${dateStr}</td>
         `;
 
-        // Store Full Object for Modal functionality
-        card.reportData = report;
+        // Click row to open modal (except when clicking checkbox)
+        tr.addEventListener('click', function (e) {
+            // Check if click was on checkbox or its wrapper
+            if (!e.target.closest('.report-checkbox') && !e.target.closest('.td-checkbox-wrapper')) {
+                openReportModal(report.id);
+            }
+        });
 
-        return card;
+        return tr;
     }
 
     // --------------------------------------------------------------------------
-    // Bulk Selection Logic (Simplified - Always Active)
+    // Bulk Selection Logic
     // --------------------------------------------------------------------------
     const btnDeleteSelected = document.getElementById('btn-delete-selected');
     const selectedCountSpan = document.getElementById('selected-count');
+
+    // Select All Checkboxes
+    const selectAllSubmitted = document.getElementById('select-all-submitted');
+    const selectAllReceived = document.getElementById('select-all-received');
+
+    if (selectAllSubmitted) {
+        selectAllSubmitted.addEventListener('change', function () {
+            const isChecked = this.checked;
+            // Only select visible checkboxes in submitted table
+            const checkboxes = document.querySelectorAll('#submitted-table-body .report-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = isChecked;
+                const id = parseInt(cb.value);
+                if (isChecked) selectedReportIds.add(id);
+                else selectedReportIds.delete(id);
+            });
+            updateDeleteButton();
+        });
+    }
+
+    if (selectAllReceived) {
+        selectAllReceived.addEventListener('change', function () {
+            const isChecked = this.checked;
+            // Only select visible checkboxes in received table
+            const checkboxes = document.querySelectorAll('#received-table-body .report-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = isChecked;
+                const id = parseInt(cb.value);
+                if (isChecked) selectedReportIds.add(id);
+                else selectedReportIds.delete(id);
+            });
+            updateDeleteButton();
+        });
+    }
 
     // 1. Update Button Visibility
     function updateDeleteButton() {
@@ -232,9 +253,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     window.openReportModal = function (reportId) {
         // Find report data
-        const card = document.querySelector(`.report-card[data-id="${reportId}"]`);
-        if (!card || !card.reportData) return;
-        const r = card.reportData;
+        const row = document.querySelector(`tr[data-id="${reportId}"]`);
+        if (!row || !row.reportData) return;
+        const r = row.reportData;
         currentReportId = r.id;
 
         // Populate View
