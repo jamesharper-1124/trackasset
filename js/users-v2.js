@@ -46,23 +46,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 renderAllUsers(allUsers);
                 loadingState.style.display = 'none';
 
-                // Update Header Profile (Parity with Dashboard)
-                if (data.currentUser) {
-                    const nameDisplay = document.getElementById('user-name-display');
-                    const imgDisplay = document.getElementById('user-profile-img');
-
-                    if (nameDisplay) {
-                        nameDisplay.textContent = data.currentUser.firstname || 'User';
-                    }
-                    if (imgDisplay && data.currentUser.profile_photo) {
-                        let src = data.currentUser.profile_photo;
-                        if (!src.startsWith('http')) {
-                            const path = src.startsWith('/') ? src : `/${src}`;
-                            src = CONFIG.apiUrl(path);
-                        }
-                        imgDisplay.src = src;
-                    }
-                }
+                // Update Header Profile is handled by auth-guard.js globally. 
+                // Removed redundant logic here to prevent conflicts.
             },
             error: function (xhr) {
                 console.error('Failed to load users', xhr);
