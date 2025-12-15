@@ -29,7 +29,13 @@ document.addEventListener('DOMContentLoaded', function () {
             $('input[name="address"]').val(user.address);
 
             // Role Display
-            $('input[name="role_display"]').val(user.role.charAt(0).toUpperCase() + user.role.slice(1));
+            const role = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+            $('input[name="role_display"]').val(role);
+
+            // Admin Access for Sidebar (Users Menu)
+            if (user.role === 'admin') {
+                $('#nav-users').show();
+            }
 
             // Handle Profile Photo Preview
             if (user.profile_photo_url || user.profile_photo) {
@@ -106,13 +112,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (sidebarToggle) {
         sidebarToggle.addEventListener('click', function () {
+            console.log('Sidebar Toggle Clicked');
             sidebar.classList.toggle('show');
             sidebarOverlay.classList.toggle('show');
         });
+    } else {
+        console.warn('Sidebar Toggle element not found');
     }
 
     if (sidebarOverlay) {
         sidebarOverlay.addEventListener('click', function () {
+            console.log('Sidebar Overlay Clicked');
             sidebar.classList.remove('show');
             sidebarOverlay.classList.remove('show');
         });
@@ -121,6 +131,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Explicit Dropdown Toggle for Settings Page
     if (dropdownBtn) {
         dropdownBtn.addEventListener('click', function (e) {
+            console.log('Dropdown Button Clicked');
             e.stopPropagation();
             if (dropdownMenu) {
                 dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
@@ -131,6 +142,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 dropdownMenu.style.display = 'none';
             }
         });
+    } else {
+        console.warn('Dropdown Button not found');
     }
 });
 
