@@ -82,17 +82,6 @@
                     </label>
                 </div>
 
-                <!-- Email -->
-                <div class="relative">
-                    <input type="email" id="email" name="email"
-                        class="floating-input peer w-full h-12 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-transparent"
-                        placeholder="Email" required>
-                    <label for="email"
-                        class="absolute left-4 top-3 text-gray-500 text-sm transition-all duration-200 pointer-events-none">
-                        Email
-                    </label>
-                </div>
-
                 <!-- Address -->
                 <div class="relative">
                     <input type="text" id="address" name="address"
@@ -115,6 +104,17 @@
                     </label>
                 </div>
 
+                <!-- Email -->
+                <div class="relative">
+                    <input type="email" id="email" name="email"
+                        class="floating-input peer w-full h-12 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-transparent"
+                        placeholder="Email" required>
+                    <label for="email"
+                        class="absolute left-4 top-3 text-gray-500 text-sm transition-all duration-200 pointer-events-none">
+                        Email
+                    </label>
+                </div>
+
                 <button type="button" onclick="showStep2()"
                     class="w-full h-12 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-md transition duration-200">
                     Next
@@ -123,6 +123,8 @@
 
             <!-- Step 2 -->
             <div id="step2" class="hidden space-y-5">
+                <p class="text-center text-gray-600">Enter your desired credentials.</p>
+
                 <!-- Username -->
                 <div class="relative">
                     <input type="text" id="username" name="username"
