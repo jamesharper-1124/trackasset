@@ -95,10 +95,29 @@ document.addEventListener('DOMContentLoaded', function () {
 
             availableContainer.innerHTML = '';
             if (availableInventories && availableInventories.length > 0) {
+                // Helper: Get Set of User's Owned Inventory IDs for fast lookup
+                const ownedIds = new Set((userInventories || []).map(i => i.id));
+
                 availableInventories.forEach(item => {
-                    // Admins can edit everything. Staff can only edit 'assigned' items (handled in section A).
-                    // In 'Available' (unassigned to them), Staff are Read-Only.
-                    availableContainer.appendChild(createInventoryCard(item, isAdmin));
+                    // Admins can edit everything.
+                    // Staff can SEE everything.
+                    // Staff can EDIT if it's THEIR item (in ownedIds), otherwise Restricted.
+
+                    let isRestricted = false;
+                    if (isStaff) {
+                        // If Staff, restricted UNLESS it's one of theirs
+                        isRestricted = !ownedIds.has(item.id);
+                    } else if (isAdmin) {
+                        isRestricted = false;
+                    } else {
+                        // Users are effectively restricted/read-only (handled by createInventoryCard canEdit=false)
+                        isRestricted = false;
+                    }
+
+                    // Pass canEdit=true for Staff so buttons render, but isRestricted handles the behavior
+                    const canEdit = isAdmin || isStaff;
+
+                    availableContainer.appendChild(createInventoryCard(item, canEdit, isRestricted));
                 });
             } else {
                 availableContainer.innerHTML = '<p style="color: #6b7280; font-style: italic;">No other inventories available.</p>';
@@ -110,7 +129,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    function createInventoryCard(item, canEdit) {
+    function createInventoryCard(item, canEdit, isRestricted = false) {
         const div = document.createElement('div');
         div.className = 'h-card';
         div.dataset.name = (item.inventory_name || '').toLowerCase();
@@ -138,7 +157,6 @@ document.addEventListener('DOMContentLoaded', function () {
         let actionsHtml = '';
 
         // Report Button (Always Visible)
-        // Adjust href to point to add_report.html with inventory_id pre-filled
         const reportBtn = `
             <a href="add_report.html?inventory_id=${item.id}" class="btn-icon-action report" title="Report Issue" style="color: #ef4444;">
                 <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -147,7 +165,8 @@ document.addEventListener('DOMContentLoaded', function () {
             </a>
         `;
 
-        if (canEdit) {
+        if (canEdit && !isRestricted) {
+            // Normal Edit/Delete for Owners/Admins
             actionsHtml = `
                 ${reportBtn}
                 <a href="edit_inventory.html?id=${item.id}" class="btn-icon-action edit" title="Edit">
@@ -161,11 +180,26 @@ document.addEventListener('DOMContentLoaded', function () {
                     </svg>
                 </button>
             `;
-        } else {
-            // Read Only users (User role or Staff viewing available) STILL see Report button
+        } else if (isRestricted) {
+            // RESTRICTED EDIT for Staff on Available items
+            // Looks like buttons, but different class/behavior
             actionsHtml = `
                 ${reportBtn}
-                <!-- <span style="font-size: 0.75rem; color: #9ca3af; font-style: italic;">Read Only</span> -->
+                <a href="#" class="btn-icon-action edit restricted-action" title="Edit">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                    </svg>
+                </a>
+                <button type="button" class="btn-icon-action delete restricted-action" title="Delete">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                </button>
+            `;
+        } else {
+            // Read Only users
+            actionsHtml = `
+                ${reportBtn}
             `;
         }
 
@@ -255,7 +289,13 @@ document.addEventListener('DOMContentLoaded', function () {
     // 4. Form Submission (Using Delegated Events & jQuery AJAX)
     // --------------------------------------------------------------------------
 
-    // A. Delete Action (Delegated)
+    // A.1 Restricted Action Handler (Staff on Available Items)
+    $(document).on('click', '.restricted-action', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        alert("You cannot edit somebody else's inventory.");
+    });
+
     // A. Delete Action (Delegated)
     $(document).on('click', '.delete-btn', function (e) {
         e.preventDefault();
