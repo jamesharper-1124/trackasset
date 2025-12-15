@@ -139,27 +139,22 @@ document.addEventListener('DOMContentLoaded', function () {
                 const margin = idx > 0 ? 'margin-left: -0.5rem;' : '';
 
                 // Fix Image URL
-                let photo = mgr.profile_photo;
-                const localDefault = 'images/profile_pic/default.png';
-
-                if (!photo || photo.includes('default.png')) {
-                    photo = localDefault;
-                } else if (!photo.startsWith('http')) {
-                    // Remove leading slash
-                    let path = photo.startsWith('/') ? photo.substring(1) : photo;
-
-                    if (path.includes('storage')) {
-                        photo = CONFIG.apiUrl('/' + path);
-                    } else if (path.startsWith('images/')) {
-                        photo = CONFIG.apiUrl('/' + path);
+                let photo = mgr.profile_photo || 'images/profile_pic/default.png';
+                if (!photo.startsWith('http')) {
+                    // Assuming local paths need fixing
+                    // Helper to ensure we don't double slashes
+                    const path = photo.startsWith('/') ? photo : '/' + photo;
+                    // Check if path implies storage or needs it - backend usually sends 'profile-photos/...' or 'storage/...'
+                    const storagePath = path.includes('storage') ? path : '/storage' + path;
+                    // Only use storage path if not default image
+                    if (!path.includes('default.png')) {
+                        photo = CONFIG.apiUrl(storagePath);
                     } else {
-                        photo = CONFIG.apiUrl('/storage/' + path);
+                        photo = CONFIG.apiUrl('/images/profile_pic/default.png');
                     }
                 }
 
-                avatars += `<img src="${photo}" alt="${mgr.firstname}" 
-                    style="width: 1.5rem; height: 1.5rem; border-radius: 9999px; object-fit: cover; border: 2px solid white; ${margin}"
-                    onerror="this.onerror=null; this.src='${localDefault}';">`;
+                avatars += `<img src="${photo}" alt="${mgr.firstname}" style="width: 1.5rem; height: 1.5rem; border-radius: 9999px; object-fit: cover; border: 2px solid white; ${margin}">`;
             });
 
             // Text
@@ -199,29 +194,35 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Room Photo
         let photoUrl = room.room_photo;
-        const localRoomDefault = 'images/rooms/default.png';
-
-        if (!photoUrl || photoUrl.includes('default.png')) {
-            photoUrl = localRoomDefault;
-        } else if (!photoUrl.startsWith('http')) {
+        if (photoUrl) {
             // Remove leading slash for cleaner handling
             let path = photoUrl.startsWith('/') ? photoUrl.substring(1) : photoUrl;
 
-            if (path.includes('storage')) {
+            // Logic:
+            // 1. If it starts with 'http', use as is.
+            // 2. If it contains 'storage', assume it's a storage path.
+            // 3. If it starts with 'images/', assume it's a public asset.
+            // 4. Otherwise, assume it needs '/storage/' prepended (Laravel default).
+
+            if (path.startsWith('http')) {
+                photoUrl = path;
+            } else if (path.includes('storage')) {
                 photoUrl = CONFIG.apiUrl('/' + path);
             } else if (path.startsWith('images/')) {
+                // public_path upload means direct access (NO storage prefix)
                 photoUrl = CONFIG.apiUrl('/' + path);
             } else {
                 photoUrl = CONFIG.apiUrl('/storage/' + path);
             }
+        } else {
+            photoUrl = CONFIG.apiUrl('/images/rooms/default.png');
         }
-
         console.log(`[DEBUG] Room: ${room.room_name}, Raw Path: ${room.room_photo}, Final URL: ${photoUrl}`);
 
         div.innerHTML = `
                 <div class="card-img-wrapper">
                     ${adminCheckbox}
-                    <img src="${photoUrl}" alt="${room.room_name}" class="card-img" onerror="this.onerror=null; this.src='${localRoomDefault}';">
+                    <img src="${photoUrl}" alt="${room.room_name}" class="card-img" onerror="this.onerror=null; this.src='${CONFIG.apiUrl('/images/rooms/default.png')}';">
                 </div>
                 <div class="card-content">
                     <h3 class="card-title">${room.room_name}</h3>
@@ -359,4 +360,3 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 });
-
