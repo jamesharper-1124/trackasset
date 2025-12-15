@@ -85,20 +85,31 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        // B. Available Inventories
         if (availableContainer) {
-            // UI Polish: For 'users' who see everything, rename header to "All Inventories"
+            // UI Polish
             const titleEl = document.getElementById('available-inventories-title');
             if (titleEl) {
-                titleEl.textContent = isUser ? 'All Inventories' : 'Available Inventories';
+                // If merging, it's effectively "All Inventories"
+                titleEl.textContent = 'All Inventories';
             }
 
             availableContainer.innerHTML = '';
-            if (availableInventories && availableInventories.length > 0) {
-                // Helper: Get Set of User's Owned Inventory IDs for fast lookup
-                const ownedIds = new Set((userInventories || []).map(i => i.id));
 
-                availableInventories.forEach(item => {
+            // MERGE: Combine User Inventories + Available Inventories
+            // Filter duplicates (though API usually separates them, better safe)
+            const allInventories = [...(userInventories || [])];
+            const ownedIds = new Set(allInventories.map(i => i.id));
+
+            if (availableInventories) {
+                availableInventories.forEach(inv => {
+                    if (!ownedIds.has(inv.id)) {
+                        allInventories.push(inv);
+                    }
+                });
+            }
+
+            if (allInventories.length > 0) {
+                allInventories.forEach(item => {
                     // Admins can edit everything.
                     // Staff can SEE everything.
                     // Staff can EDIT if it's THEIR item (in ownedIds), otherwise Restricted.
@@ -110,11 +121,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     } else if (isAdmin) {
                         isRestricted = false;
                     } else {
-                        // Users are effectively restricted/read-only (handled by createInventoryCard canEdit=false)
+                        // Users are effectively restricted/read-only
                         isRestricted = false;
                     }
 
-                    // Pass canEdit=true for Staff so buttons render, but isRestricted handles the behavior
+                    // Pass canEdit=true for Staff so buttons render, but isRestricted checks ownership
                     const canEdit = isAdmin || isStaff;
 
                     availableContainer.appendChild(createInventoryCard(item, canEdit, isRestricted));
