@@ -10,8 +10,9 @@
 
     <!-- Tailwind CSS (Layout) -->
     <script src="https://cdn.tailwindcss.com"></script>
-        <link rel="stylesheet" href="css/logres.css">
 
+    <!-- Custom CSS (Floating Labels) -->
+    <link rel="stylesheet" href="css/logres.css">
 
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -23,8 +24,9 @@
     <script src="js/guest-guard.js"></script>
 
     <script src="js/register.js"></script>
-        <style>
-        /* Fallback for floating labels if css file is missing */
+
+    <style>
+        /* Fallback for floating labels */
         .floating-input:placeholder-shown~label {
             top: 0.75rem;
             font-size: 0.875rem;
@@ -43,8 +45,8 @@
     </style>
 </head>
 
-<body class="bg-gray-100 flex items-center justify-center min-h-screen px-4">
-    <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="w-full max-w-sm bg-white p-8 rounded-lg border border-gray-200">
         <!-- Logo -->
         <div class="flex justify-center mb-6">
             <img id="app-logo" src="images/inventory/default.png" alt="App Logo"
@@ -54,57 +56,109 @@
 
         <div id="alert-container"></div>
 
-        <form id="register-form">
+        <form id="register-form" class="space-y-5">
 
             <!-- Step 1 -->
-            <div id="step1">
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">First Name</label>
-                    <input type="text" name="firstname"
-                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+            <div id="step1" class="space-y-5">
+                <!-- First Name -->
+                <div class="relative">
+                    <input type="text" id="firstname" name="firstname"
+                        class="floating-input peer w-full h-12 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-transparent"
+                        placeholder="First Name" required>
+                    <label for="firstname"
+                        class="absolute left-4 top-3 text-gray-500 text-sm transition-all duration-200 pointer-events-none">
+                        First Name
+                    </label>
                 </div>
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Last Name</label>
-                    <input type="text" name="lastname"
-                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+
+                <!-- Last Name -->
+                <div class="relative">
+                    <input type="text" id="lastname" name="lastname"
+                        class="floating-input peer w-full h-12 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-transparent"
+                        placeholder="Last Name" required>
+                    <label for="lastname"
+                        class="absolute left-4 top-3 text-gray-500 text-sm transition-all duration-200 pointer-events-none">
+                        Last Name
+                    </label>
                 </div>
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
-                    <input type="email" name="email"
-                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+
+                <!-- Email -->
+                <div class="relative">
+                    <input type="email" id="email" name="email"
+                        class="floating-input peer w-full h-12 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-transparent"
+                        placeholder="Email" required>
+                    <label for="email"
+                        class="absolute left-4 top-3 text-gray-500 text-sm transition-all duration-200 pointer-events-none">
+                        Email
+                    </label>
                 </div>
+
+                <!-- Address -->
+                <div class="relative">
+                    <input type="text" id="address" name="address"
+                        class="floating-input peer w-full h-12 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-transparent"
+                        placeholder="Address" required>
+                    <label for="address"
+                        class="absolute left-4 top-3 text-gray-500 text-sm transition-all duration-200 pointer-events-none">
+                        Address
+                    </label>
+                </div>
+
+                <!-- Phone -->
+                <div class="relative">
+                    <input type="text" id="phone" name="phone"
+                        class="floating-input peer w-full h-12 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-transparent"
+                        placeholder="Phone Number" required>
+                    <label for="phone"
+                        class="absolute left-4 top-3 text-gray-500 text-sm transition-all duration-200 pointer-events-none">
+                        Phone Number
+                    </label>
+                </div>
+
                 <button type="button" onclick="showStep2()"
-                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full transition duration-200">
+                    class="w-full h-12 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-md transition duration-200">
                     Next
                 </button>
             </div>
 
             <!-- Step 2 -->
-            <div id="step2" class="hidden">
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Username</label>
-                    <input type="text" name="username"
-                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+            <div id="step2" class="hidden space-y-5">
+                <!-- Username -->
+                <div class="relative">
+                    <input type="text" id="username" name="username"
+                        class="floating-input peer w-full h-12 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-transparent"
+                        placeholder="Username" required>
+                    <label for="username"
+                        class="absolute left-4 top-3 text-gray-500 text-sm transition-all duration-200 pointer-events-none">
+                        Username
+                    </label>
                 </div>
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
-                    <input type="password" name="password"
-                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+
+                <!-- Password -->
+                <div class="relative">
+                    <input type="password" id="password" name="password"
+                        class="floating-input peer w-full h-12 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-transparent"
+                        placeholder="Password" required>
+                    <label for="password"
+                        class="absolute left-4 top-3 text-gray-500 text-sm transition-all duration-200 pointer-events-none">
+                        Password
+                    </label>
                 </div>
-                <div class="flex justify-between">
+
+                <div class="flex justify-between space-x-4">
                     <button type="button" onclick="showStep1()"
-                        class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded transition duration-200">
+                        class="w-1/2 h-12 bg-gray-500 hover:bg-gray-600 text-white font-bold rounded-md transition duration-200">
                         Back
                     </button>
                     <button type="submit"
-                        class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition duration-200">
+                        class="w-1/2 h-12 bg-green-600 hover:bg-green-700 text-white font-bold rounded-md transition duration-200">
                         Register
                     </button>
                 </div>
             </div>
 
             <div class="mt-4 text-center">
-                <a class="text-sm text-blue-500 hover:text-blue-800" href="login.html">
+                <a class="text-sm text-indigo-600 hover:text-indigo-800 hover:underline" href="login.html">
                     Already have an account? Login
                 </a>
             </div>
@@ -112,6 +166,4 @@
     </div>
 </body>
 
-
 </html>
-

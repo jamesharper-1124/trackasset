@@ -10,8 +10,10 @@
 
     <!-- Tailwind CSS (Layout) -->
     <script src="https://cdn.tailwindcss.com"></script>
-        <link rel="stylesheet" href="css/logres.css">
 
+    <!-- Scripts -->
+    <!-- Custom CSS (Floating Labels) -->
+    <link rel="stylesheet" href="css/logres.css">
 
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -23,10 +25,29 @@
     <script src="js/auth-guard.js"></script>
 
     <script src="js/verify.js"></script>
+
+    <style>
+        /* Fallback for floating labels */
+        .floating-input:placeholder-shown~label {
+            top: 0.75rem;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .floating-input:focus~label,
+        .floating-input:not(:placeholder-shown)~label {
+            top: -0.5rem;
+            left: 0.75rem;
+            font-size: 0.75rem;
+            color: #4f46e5;
+            background-color: white;
+            padding: 0 0.25rem;
+        }
+    </style>
 </head>
 
 <body class="bg-gray-100 flex items-center justify-center min-h-screen px-4">
-    <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
+    <div class="w-full max-w-sm bg-white p-8 rounded-lg border border-gray-200">
         <!-- Logo -->
         <div class="flex justify-center mb-6">
             <img src="images/inventory/default.png" alt="App Logo"
@@ -40,30 +61,32 @@
 
         <div id="alert-container"></div>
 
-        <form id="verify-form">
+        <form id="verify-form" class="space-y-5">
             <input type="hidden" name="email" id="email-input">
 
-            <div class="mb-6">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Verification Code</label>
-                <input type="text" name="code" placeholder="123456"
-                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-center text-xl tracking-widest"
-                    required>
+            <div class="relative">
+                <input type="text" name="code" id="code"
+                    class="floating-input peer w-full h-12 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-transparent text-center text-xl tracking-widest"
+                    placeholder="Verification Code" required>
+                <label for="code"
+                    class="absolute left-4 top-3 text-gray-500 text-sm transition-all duration-200 pointer-events-none bg-white px-1">
+                    Verification Code
+                </label>
             </div>
 
             <button
-                class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded w-full focus:outline-none focus:shadow-outline transition duration-200"
+                class="w-full h-12 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-md transition duration-200"
                 type="submit">
                 Verify Account
             </button>
         </form>
 
         <div class="mt-4 text-center">
-            <a class="text-sm text-blue-500 hover:text-blue-800" href="login.html">
+            <a class="text-sm text-indigo-600 hover:text-indigo-800 hover:underline" href="login.html">
                 Back to Login
             </a>
         </div>
     </div>
 </body>
-
 
 </html>
