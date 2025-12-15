@@ -6,12 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile Settings - TrackAsset</title>
     <!-- Link to custom CSS -->
-
+    <link rel="stylesheet" href="css/inventories.css?v=8">
+    <link rel="stylesheet" href="css/dashboard.css?v=8">
     <link rel="stylesheet" href="css/users_fixed.css?v=22">
     <link rel="stylesheet" href="css/add_users.css?v=8">
-    <link rel="stylesheet" href="css/inventories.css?v=4">
-    <link rel="stylesheet" href="css/dashboard.css?v=4">
-    <link rel="stylesheet" href="css/rooms.css?v=4">
 
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -71,7 +69,7 @@
                     </svg>
                     Rooms
                 </a>
-                <a href="users.html" class="nav-link">
+                <a href="users.html" class="nav-link" id="nav-users" style="display: none;">
                     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
@@ -127,8 +125,7 @@
                             <a href="settings.html"
                                 style="display:block; padding:0.5rem 1rem; font-size:0.875rem; color:#374151; text-decoration:none; background-color: #f3f4f6;">Settings</a>
                             <button id="logout-btn" type="button"
-                                style="display:block; width:100%; text-align:left; padding:0.5rem 1rem; font-size:0.875rem; color:#dc2626; background:none; border:none; cursor:pointer;"
-                                onclick="logout()">
+                                style="display:block; width:100%; text-align:left; padding:0.5rem 1rem; font-size:0.875rem; color:#dc2626; background:none; border:none; cursor:pointer;">
                                 Logout
                             </button>
                         </div>
