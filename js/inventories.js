@@ -1,187 +1,150 @@
 document.addEventListener('DOMContentLoaded', function () {
     const token = localStorage.getItem('auth_token');
+
+    // Auth Check
     if (!token) {
-        window.location.href = 'login.html';
+        window.location.href = 'login.html?error=session_expired';
         return;
     }
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const roomId = urlParams.get('room_id');
-
-    if (!roomId) {
-        alert('No Room ID specified.');
-        window.location.href = 'rooms.html';
-        return;
-    }
-
-    // Sidebar & Dropdown Logic
-    const sidebar = document.getElementById('sidebar');
-    const sidebarOverlay = document.getElementById('sidebar-overlay');
-    const sidebarToggle = document.getElementById('sidebar-toggle');
-    const dropdownBtn = document.getElementById('dropdown-btn');
-    const dropdownMenu = document.getElementById('dropdown-menu');
-
-    if (sidebarToggle) {
-        sidebarToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('show');
-            sidebarOverlay.classList.toggle('show');
-        });
-    }
-
-    if (sidebarOverlay) {
-        sidebarOverlay.addEventListener('click', () => {
-            sidebar.classList.remove('show');
-            sidebarOverlay.classList.remove('show');
-        });
-    }
-
-    if (dropdownBtn && dropdownMenu) {
-        dropdownBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
-        });
-        document.addEventListener('click', (e) => {
-            if (!dropdownBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
-                dropdownMenu.style.display = 'none';
-            }
-        });
-    }
-
-    const logoutBtn = document.getElementById('logout-btn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
-            localStorage.removeItem('auth_token');
-            window.location.href = 'login.html';
-        });
-    }
-
-    // Elements
-    const pageTitle = document.getElementById('page-title');
-    const roomHeader = document.getElementById('room-header'); // New sub-header
-    const grid = document.getElementById('inventory-grid');
-    const loading = document.getElementById('loading');
-    const noData = document.getElementById('no-data');
+    const assignedContainer = document.getElementById('assigned-inventories-container');
+    const assignedSection = document.getElementById('assigned-inventories-section');
+    const availableContainer = document.getElementById('available-inventories-container');
     const searchInput = document.getElementById('inventory-search');
-    const radioButtons = document.querySelectorAll('input[name="status-filter"]');
+    const radioButtons = document.querySelectorAll('input[name="search-filter"]');
 
-    // Global variables
-    let currentUser = null;
-    let currentRoom = null;
+    // --------------------------------------------------------------------------
+    // 1. Initial Data Fetch (Only on Index Page)
+    // --------------------------------------------------------------------------
+    if (assignedContainer || availableContainer) {
+        fetchInventoriesData();
+    }
 
-    // Fetch Data
-    // We need two things:
-    // 1. Current User Info (for permissions) -> from /api/inventories/data (or better endpoint if available, but this works)
-    // 2. Room Data -> from /api/rooms/{id}
+    function fetchInventoriesData() {
+        console.log('Fetching Inventories... Token:', token);
 
-    // Helper to fetch user info first
-    function fetchUserInfo() {
-        return $.ajax({
+        // Using jQuery AJAX to leverage global auth-guard setup
+        $.ajax({
             url: CONFIG.apiUrl('/api/inventories/data?t=' + new Date().getTime()),
-            method: 'GET'
+            method: 'GET',
+            success: function (data) {
+                if (data) {
+                    renderInventories(data);
+                }
+            },
+            error: function (xhr) {
+                console.error('Error loading inventories:', xhr);
+                // 401 indicates session expired, handled by auth-guard.js
+            }
         });
     }
 
-    // Helper to fetch room data
-    function fetchRoomData() {
-        return $.ajax({
-            url: CONFIG.apiUrl(`/api/rooms/${roomId}`),
-            method: 'GET'
-        });
-    }
+    // --------------------------------------------------------------------------
+    // 2. Rendering Logic
+    // --------------------------------------------------------------------------
+    function renderInventories(data) {
+        if (!assignedContainer && !availableContainer) return;
 
-    loading.style.display = 'block';
+        const { userInventories, availableInventories, currentUser } = data;
 
-    // Execute both
-    $.when(fetchUserInfo(), fetchRoomData())
-        .done(function (userDataArgs, roomDataArgs) {
-            loading.style.display = 'none';
+        console.log('[DEBUG] renderInventories data:', data);
 
-            // userDataArgs[0] is the data object from the first call
-            const userData = userDataArgs[0];
-            const roomData = roomDataArgs[0];
-
-            if (userData && userData.currentUser) {
-                currentUser = userData.currentUser;
-            }
-
-            if (roomData && roomData.room) {
-                currentRoom = roomData.room;
-                // Update header
-                if (roomHeader) {
-                    roomHeader.textContent = `Inventories in ${currentRoom.room_name}`;
-                }
-
-                // Determine permissions
-                // Logic derived from inventories.js:
-                // Admin: Full access
-                // Staff: Full access if Assigned (manager_id matches), Restricted if Available (not manager)
-                // User: Read Only
-
-                let isAdmin = false;
-                let isStaff = false;
-                let isManager = false;
-
-                if (currentUser) {
-                    isAdmin = (currentUser.role === 'admin');
-                    isStaff = (currentUser.role === 'staff');
-                    // Check if current user manages this room
-                    // Assuming room object has manager_id or we compare IDs
-                    // User object usually has id. Room has manager_id?
-                    // Let's debug what roomData has.
-                    // For now, if we don't have manager_id, we might default to restricted for staff.
-                    // But usually API provides it.
-                    if (currentRoom.manager_id && currentUser.id) {
-                        isManager = (currentRoom.manager_id == currentUser.id);
-                    }
-                }
-
-                // Determine if actions should be restricted
-                // If Admin: Not restricted.
-                // If Staff: Restricted UNLESS isManager.
-                // If User: Always read only (handled by createCard logic 'canEdit')
-
-                let canEdit = isAdmin || (isStaff && isManager);
-                let isRestricted = (isStaff && !isManager);
-
-                // If it's a regular user, canEdit is false, so isRestricted doesn't matter (actions won't show)
-
-                renderInventories(currentRoom.inventories || [], canEdit, isRestricted);
-            } else {
-                noData.style.display = 'block';
-                noData.textContent = "Room not found or empty.";
-            }
-
-        })
-        .fail(function (xhr) {
-            loading.style.display = 'none';
-            console.error('Error loading data:', xhr);
-            if (xhr.status === 401) {
-                window.location.href = 'login.html'; // Auth guard ensures this mostly
-            } else {
-                noData.style.display = 'block';
-                noData.textContent = "Error loading data.";
-            }
-        });
-
-    function renderInventories(inventories, canEdit, isRestricted) {
-        grid.innerHTML = '';
-        if (!inventories || inventories.length === 0) {
-            noData.style.display = 'block';
+        // Safety checks for currentUser
+        if (!currentUser) {
+            console.error('[ERROR] currentUser is missing from API response!');
             return;
         }
-        noData.style.display = 'none';
 
-        inventories.forEach(item => {
-            grid.appendChild(createInventoryCard(item, canEdit, isRestricted));
-        });
+        const isAdmin = (currentUser.role === 'admin');
+        const isStaff = (currentUser.role === 'staff');
+        const isUser = (currentUser.role === 'user');
+
+        console.log('[DEBUG] Role:', currentUser.role, 'isAdmin:', isAdmin, 'isStaff:', isStaff, 'isUser:', isUser);
+
+        // Show "Add Inventory" button if Admin or Staff
+        const addBtn = document.getElementById('add-inventory-btn');
+        if (addBtn) {
+            // Only Admin and Staff can add inventories
+            if (isAdmin || isStaff) {
+                addBtn.style.display = 'inline-flex';
+            } else {
+                addBtn.style.display = 'none';
+            }
+        }
+
+        // A. Assigned Inventories
+        if ((isAdmin || isStaff) && assignedContainer) {
+            assignedSection.style.display = 'block';
+            assignedContainer.innerHTML = '';
+            if (userInventories && userInventories.length > 0) {
+                userInventories.forEach(item => {
+                    assignedContainer.appendChild(createInventoryCard(item, true));
+                });
+            } else {
+                assignedContainer.innerHTML = '<p style="color: #6b7280; font-style: italic;">No inventories assigned to your rooms.</p>';
+            }
+        }
+
+        if (availableContainer) {
+            // UI Polish
+            const titleEl = document.getElementById('available-inventories-title');
+            if (titleEl) {
+                // If merging, it's effectively "All Inventories"
+                titleEl.textContent = 'All Inventories';
+            }
+
+            availableContainer.innerHTML = '';
+
+            // MERGE: Combine User Inventories + Available Inventories
+            // Filter duplicates (though API usually separates them, better safe)
+            const allInventories = [...(userInventories || [])];
+            const ownedIds = new Set(allInventories.map(i => i.id));
+
+            if (availableInventories) {
+                availableInventories.forEach(inv => {
+                    if (!ownedIds.has(inv.id)) {
+                        allInventories.push(inv);
+                    }
+                });
+            }
+
+            if (allInventories.length > 0) {
+                allInventories.forEach(item => {
+                    // Admins can edit everything.
+                    // Staff can SEE everything.
+                    // Staff can EDIT if it's THEIR item (in ownedIds), otherwise Restricted.
+
+                    let isRestricted = false;
+                    if (isStaff) {
+                        // If Staff, restricted UNLESS it's one of theirs
+                        isRestricted = !ownedIds.has(item.id);
+                    } else if (isAdmin) {
+                        isRestricted = false;
+                    } else {
+                        // Users are effectively restricted/read-only
+                        isRestricted = false;
+                    }
+
+                    // Pass canEdit=true for Staff so buttons render, but isRestricted checks ownership
+                    const canEdit = isAdmin || isStaff;
+
+                    availableContainer.appendChild(createInventoryCard(item, canEdit, isRestricted));
+                });
+            } else {
+                availableContainer.innerHTML = '<p style="color: #6b7280; font-style: italic;">No other inventories available.</p>';
+            }
+        }
+
+        if (searchInput && searchInput.value) {
+            filterInventories();
+        }
     }
 
-    // Exact copy of createInventoryCard from inventories.js
     function createInventoryCard(item, canEdit, isRestricted = false) {
         const div = document.createElement('div');
         div.className = 'h-card';
         div.dataset.name = (item.inventory_name || '').toLowerCase();
-        div.dataset.room = (item.room ? item.room.room_name : (currentRoom ? currentRoom.room_name : '')).toLowerCase();
+        div.dataset.room = (item.room ? item.room.room_name : '').toLowerCase();
         div.dataset.condition = (item.status_condition || '').toLowerCase();
 
         let photoUrl = item.inventory_photo || 'images/inventory/default.png';
@@ -196,7 +159,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        const roomName = item.room ? item.room.room_name : (currentRoom ? currentRoom.room_name : 'Unassigned');
+        const roomName = item.room ? item.room.room_name : 'Unassigned';
 
         let statusClass = 'status-good';
         if (item.status_condition === 'NEEDS ATTENTION') statusClass = 'status-fair';
@@ -230,6 +193,7 @@ document.addEventListener('DOMContentLoaded', function () {
             `;
         } else if (isRestricted) {
             // RESTRICTED EDIT for Staff on Available items
+            // Looks like buttons, but different class/behavior
             actionsHtml = `
                 ${reportBtn}
                 <a href="#" class="btn-icon-action edit restricted-action" title="Edit">
@@ -252,7 +216,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         div.innerHTML = `
             <div class="h-card-img-wrapper">
-                <img src="${photoUrl}" alt="${item.inventory_name}" onerror="this.onerror=null; this.src='images/inventory/default.png';">
+                <img src="${photoUrl}" alt="${item.inventory_name}">
             </div>
             <div class="h-card-content">
                 <div class="h-card-info">
@@ -275,6 +239,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         <span class="card-status ${statusClass}">${item.status_condition}</span>
                     </div>
                     <div class="remarks-wrapper">
+                        <!-- 'marquee-animation' class is defined in inventories.css -->
                          <div style="overflow: hidden; white-space: nowrap;">
                             <span class="remarks-text" style="display: inline-block; padding-left: 0; animation: marquee 10s linear infinite;">Remarks: ${item.remarks || 'NONE'}</span>
                          </div>
@@ -294,35 +259,27 @@ document.addEventListener('DOMContentLoaded', function () {
         return div;
     }
 
-    // Filter Logic
+    // --------------------------------------------------------------------------
+    // 3. Search / Filter
+    // --------------------------------------------------------------------------
     function filterInventories() {
-        const searchTerm = searchInput.value.toLowerCase();
-        // view_inventory.html had 'status-filter', inventories.html has 'search-filter'.
-        // We should check what the HTML has.
-        // Step 143 showed view_inventory.html has name="status-filter".
-        // To be SAFE, we will support status-filter radios here properly for this page.
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        const filterRadio = document.querySelector('input[name="search-filter"]:checked');
+        if (!filterRadio) return;
 
-        const selectedStatusRadio = document.querySelector('input[name="status-filter"]:checked');
-        const selectedStatus = selectedStatusRadio ? selectedStatusRadio.value : 'all';
-
+        const filterType = filterRadio.value;
         const cards = document.querySelectorAll('.h-card');
+
         cards.forEach(card => {
-            const name = card.dataset.name;
-            const condition = card.dataset.condition; // 'good', 'needs attention', 'n.g'
-
-            // Matches Search
-            const matchesSearch = name.includes(searchTerm);
-
-            // Matches Status
-            // view_inventory.html values: 'all', 'Good', 'Needs Attention', 'N.G'
-            // card.dataset.condition: 'good', 'needs attention', 'n.g' (lowercased)
-
-            let matchesStatus = (selectedStatus === 'all');
-            if (!matchesStatus) {
-                matchesStatus = (condition === selectedStatus.toLowerCase());
+            let valueToCheck = '';
+            switch (filterType) {
+                case 'name': valueToCheck = card.dataset.name; break;
+                case 'room': valueToCheck = card.dataset.room; break;
+                case 'condition': valueToCheck = card.dataset.condition; break;
+                default: valueToCheck = card.dataset.name;
             }
 
-            if (matchesSearch && matchesStatus) {
+            if (valueToCheck.includes(searchTerm)) {
                 card.style.display = '';
             } else {
                 card.style.display = 'none';
@@ -333,35 +290,67 @@ document.addEventListener('DOMContentLoaded', function () {
     if (searchInput) {
         searchInput.addEventListener('input', filterInventories);
     }
-
     if (radioButtons) {
         radioButtons.forEach(radio => {
             radio.addEventListener('change', filterInventories);
         });
     }
 
-    // Event Delegation (Matches inventories.js)
+    // --------------------------------------------------------------------------
+    // 4. Form Submission (Using Delegated Events & jQuery AJAX)
+    // --------------------------------------------------------------------------
+
+    // A.1 Restricted Action Handler (Staff on Available Items)
     $(document).on('click', '.restricted-action', function (e) {
         e.preventDefault();
         e.stopPropagation();
         alert("You cannot edit somebody else's inventory.");
     });
 
+    // A. Delete Action (Delegated)
     $(document).on('click', '.delete-btn', function (e) {
         e.preventDefault();
+
+        // STRICT SESSION CHECK
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+            alert('Session Expired. Please log in again.');
+            localStorage.removeItem('auth_token');
+            window.location.href = 'login.html';
+            return;
+        }
+
         const id = $(this).data('id');
         if (!confirm('Are you sure you want to delete this inventory?')) return;
 
-        // Use CONFIG.apiUrl
         $.ajax({
             url: CONFIG.apiUrl('/api/inventories/' + id),
             method: 'DELETE',
-            success: function () {
-                location.reload();
+            success: function (response) {
+                fetchInventoriesData(); // Refresh list
             },
-            error: function () {
-                alert('Failed to delete item.');
+            error: function (xhr) {
+                console.error('Delete error:', xhr);
+                // 401 is handled by global auth-guard
+                if (xhr.status !== 401) {
+                    alert('Failed to delete item.');
+                }
             }
         });
     });
+
+    // B. Create/Update Form Handling (Targeting #inventory-form usually found in Add/Edit pages)
+    // Note: Add/Edit pages might need their own scripts or we can include them here if they share IDs.
+    // Assuming standard form submission for now for add/edit pages if they are separate views. 
+    // BUT we should genericize it.
+
+    // B. Create/Update Form Handling
+    // MOVED TO add_inventory.js and edit_inventory.js. 
+    // This file should only handle the LIST/INDEX view logic.
+    /*
+    const inventoryForm = $('form[action*="inventories"]');
+    if (inventoryForm.length > 0 && !inventoryForm.hasClass('delete-form')) {
+       // Logic removed to prevent double-submission
+    }
+    */
 });
