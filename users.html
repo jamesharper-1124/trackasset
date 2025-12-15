@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://code.jquery.com; connect-src 'self' https://tangian.alwaysdata.net; img-src 'self' data: https://tangian.alwaysdata.net">
     <title>Users - TrackAsset</title>
     <!-- CSS Dependencies -->
     <link rel="stylesheet" href="css/inventories.css?v=8">
@@ -115,8 +117,7 @@
 
                             <!-- Logout Button (Handled by auth-guard usually, or inline JS) -->
                             <button id="logout-btn" type="button"
-                                style="display:block; width:100%; text-align:left; padding:0.5rem 1rem; font-size:0.875rem; color:#dc2626; background:none; border:none; cursor:pointer;"
-                                onclick="logout()">
+                                style="display:block; width:100%; text-align:left; padding:0.5rem 1rem; font-size:0.875rem; color:#dc2626; background:none; border:none; cursor:pointer;">
                                 Logout
                             </button>
                         </div>
