@@ -103,13 +103,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
         inventories.forEach(inv => {
             const card = document.createElement('div');
-            card.className = 'card';
-            card.style.display = 'flex';
-            card.style.flexDirection = 'column';
+            card.className = 'h-card';
+            // Data attributes for filtering if needed later
+            card.dataset.name = (inv.inventory_name || '').toLowerCase();
+            card.dataset.condition = (inv.status_condition || '').toLowerCase();
 
-            let photoUrl = inv.inventory_photo || 'images/inventory/default.png';
-            if (!photoUrl.startsWith('http')) {
-                const path = photoUrl.startsWith('/') ? photoUrl.substring(1) : photoUrl;
+            // Robust Image Logic
+            let photoUrl = inv.inventory_photo;
+            const localDefault = 'images/inventory/default.png';
+
+            if (!photoUrl || photoUrl.includes('default.png')) {
+                photoUrl = localDefault;
+            } else if (!photoUrl.startsWith('http')) {
+                let path = photoUrl.startsWith('/') ? photoUrl.substring(1) : photoUrl;
                 if (path.includes('storage')) {
                     photoUrl = CONFIG.apiUrl('/' + path);
                 } else if (path.startsWith('images/')) {
@@ -119,23 +125,42 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
 
-            // Status Color
-            let statusColor = '#10b981'; // green (Good)
-            if (inv.status === 'Needs Attention') statusColor = '#f59e0b'; // amber
-            if (inv.status === 'N.G') statusColor = '#ef4444'; // red
+            // Status Styling
+            let statusClass = 'status-good';
+            if (inv.status_condition === 'NEEDS ATTENTION') statusClass = 'status-fair';
+            if (inv.status_condition === 'N.G') statusClass = 'status-danger';
 
             card.innerHTML = `
-                <div class="card-img-wrapper" style="position:relative;">
-                    <span style="position:absolute; top:0.5rem; right:0.5rem; background-color:${statusColor}; color:white; padding:0.25rem 0.5rem; border-radius:9999px; font-size:0.75rem; font-weight:600;">
-                        ${inv.status}
-                    </span>
-                    <img src="${photoUrl}" alt="${inv.item_name}" class="card-img" style="height:12rem; width:100%; object-fit:cover;" onerror="this.onerror=null; this.src='${CONFIG.apiUrl('/images/uploads/inventory/default.png')}';">
+                <div class="h-card-img-wrapper">
+                    <img src="${photoUrl}" alt="${inv.inventory_name}" onerror="this.onerror=null; this.src='${localDefault}';">
                 </div>
-                <div class="card-content" style="padding:1rem; flex:1;">
-                    <h3 class="card-title" style="margin-bottom:0.5rem;">${inv.item_name}</h3>
-                    <p style="font-size:0.875rem; color:#6b7280; margin-bottom:0.25rem;">SKU: ${inv.sku}</p>
-                    <p style="font-size:0.875rem; color:#6b7280; margin-bottom:0.5rem;">Price: ₱${parseFloat(inv.price).toLocaleString()}</p>
-                    <p style="font-size:0.875rem; color:#374151;">${inv.description || 'No description'}</p>
+                <div class="h-card-content">
+                    <div class="h-card-info">
+                        <h4 class="h-card-title">${inv.inventory_name}</h4>
+                        <div class="h-card-meta">
+                             <span class="meta-item">
+                                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                </svg>
+                                Qty: ${inv.quantity}
+                            </span>
+                        </div>
+                        <div class="status-wrapper">
+                            <span class="card-status ${statusClass}">${inv.status_condition}</span>
+                        </div>
+                        <div class="remarks-wrapper">
+                             <div style="overflow: hidden; white-space: nowrap;">
+                                <span class="remarks-text" style="display: inline-block; padding-left: 0; animation: marquee 10s linear infinite;">Remarks: ${inv.remarks || 'NONE'}</span>
+                             </div>
+                             <style>
+                                @keyframes marquee {
+                                    0% { transform: translateX(100%); }
+                                    100% { transform: translateX(-100%); }
+                                }
+                             </style>
+                        </div>
+                    </div>
+                    <!-- No Actions for View Only page typically, or add if needed -->
                 </div>
             `;
             grid.appendChild(card);
