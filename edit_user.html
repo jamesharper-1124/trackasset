@@ -4,14 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://code.jquery.com; connect-src 'self' https://tangian.alwaysdata.net; img-src 'self' data: https://tangian.alwaysdata.net">
     <title>Edit User - TrackAsset</title>
     <!-- Link to custom CSS -->
-
+    <link rel="stylesheet" href="css/inventories.css?v=8">
+    <link rel="stylesheet" href="css/dashboard.css?v=8">
     <link rel="stylesheet" href="css/users_fixed.css?v=22">
     <link rel="stylesheet" href="css/add_users.css?v=8">
-    <link rel="stylesheet" href="css/inventories.css?v=4">
-    <link rel="stylesheet" href="css/dashboard.css?v=4">
-    <link rel="stylesheet" href="css/rooms.css?v=4">
+
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -22,7 +23,6 @@
     <script src="js/auth-guard.js?v=2"></script>
 
     <script src="js/edit_users.js?v=5"></script>
-        <script src="js/profile_settings.js?v=5"></script>
 </head>
 
 <body>
