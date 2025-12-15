@@ -164,6 +164,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 avatars += `<img src="${photo}" alt="${mgr.firstname}" 
                     style="width: 1.5rem; height: 1.5rem; border-radius: 9999px; object-fit: cover; border: 2px solid white; ${margin}"
                     onerror="this.onerror=null; this.src='${localDefault}';">`;
+
+
+
             });
 
             // Text
@@ -363,3 +366,4 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 });
+
