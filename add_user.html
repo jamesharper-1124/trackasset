@@ -4,8 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://code.jquery.com; connect-src 'self' https://tangian.alwaysdata.net; img-src 'self' data: https://tangian.alwaysdata.net">
     <title>Add User - TrackAsset</title>
     <!-- Link to custom CSS -->
+
     <link rel="stylesheet" href="css/users_fixed.css?v=22">
     <link rel="stylesheet" href="css/add_users.css?v=8">
     <link rel="stylesheet" href="css/inventories.css?v=4">
@@ -16,11 +19,12 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <!-- Config (Must be loaded first) -->
-    <script src="js/config.js?v=2"></script>
+    <script src="js/config.js?v=5"></script>
 
     <!-- Auth Guard (Handles 401 & Token) -->
     <script src="js/auth-guard.js?v=2"></script>
-    <script src="js/add_users.js?v=4"></script>
+
+    <script src="js/add_users.js?v=5"></script>
 </head>
 
 <body>
@@ -139,8 +143,7 @@
                 <div class="form-container">
                     <h3 class="form-title">Add New User</h3>
 
-                    <form action="/api/users" method="POST" enctype="multipart/form-data">
-
+                    <form id="add-user-form" action="/api/users" method="POST" enctype="multipart/form-data">
                         <div id="error-message"
                             style="display: none; background-color: #fee2e2; color: #b91c1c; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">
                         </div>
@@ -235,7 +238,3 @@
 </body>
 
 </html>
-
-
-
-
