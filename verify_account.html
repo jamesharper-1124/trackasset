@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://code.jquery.com; connect-src 'self' https://tangian.alwaysdata.net; img-src 'self' data: https://tangian.alwaysdata.net">
     <title>Verify Account - TrackAsset</title>
 
     <!-- Tailwind CSS (Layout) -->
@@ -15,8 +17,8 @@
     <!-- Config (Must be loaded first) -->
     <script src="js/config.js"></script>
 
-    <!-- Auth Guard -->
-    <script src="js/guest-guard.js"></script>
+    <!-- Auth Guard (Handles token check and verification status) -->
+    <script src="js/auth-guard.js"></script>
 
     <script src="js/verify.js"></script>
 </head>
