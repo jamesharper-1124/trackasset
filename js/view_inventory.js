@@ -130,8 +130,18 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Let's debug what roomData has.
                     // For now, if we don't have manager_id, we might default to restricted for staff.
                     // But usually API provides it.
-                    if (currentRoom.manager_id && currentUser.id) {
-                        isManager = (currentRoom.manager_id == currentUser.id);
+                    if (currentUser.id) {
+                        const userId = String(currentUser.id);
+
+                        // Check direct manager_id
+                        if (currentRoom.manager_id) {
+                            isManager = (String(currentRoom.manager_id) === userId);
+                        }
+
+                        // Also check if 'managers' array exists (many-to-many)
+                        if (!isManager && currentRoom.managers && Array.isArray(currentRoom.managers)) {
+                            isManager = currentRoom.managers.some(m => String(m.id) === userId);
+                        }
                     }
                 }
 
