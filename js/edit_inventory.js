@@ -37,7 +37,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // User Assignment Elements
     const assignedUserGroup = document.getElementById('assigned-user-group');
-    const assignedUserSelect = document.getElementById('assigned_user_id');
+    const usersChecklist = document.getElementById('users-checklist');
+    // const assignedUserSelect = document.getElementById('assigned_user_id'); // Removed
 
     // Standard Inputs
     const nameInput = document.getElementById('inventory_name');
@@ -80,12 +81,32 @@ document.addEventListener('DOMContentLoaded', function () {
             });
             if (!response.ok) throw new Error('Failed to load users');
             const data = await response.json();
-            assignedUserSelect.innerHTML = '<option value="" disabled selected>Select User...</option>';
+            usersChecklist.innerHTML = '';
+
+            if (data.length === 0) {
+                usersChecklist.innerHTML = '<div style="color:#6b7280; font-size:0.9rem;">No users found.</div>';
+                return;
+            }
+
             data.forEach(u => {
-                const opt = document.createElement('option');
-                opt.value = u.id;
-                opt.textContent = `${u.name} (${u.role})`;
-                assignedUserSelect.appendChild(opt);
+                const div = document.createElement('div');
+                div.style.marginBottom = '0.25rem';
+
+                const label = document.createElement('label');
+                label.style.display = 'flex';
+                label.style.alignItems = 'center';
+                label.style.cursor = 'pointer';
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.name = 'assigned_user_ids[]';
+                checkbox.value = u.id;
+                checkbox.style.marginRight = '0.5rem';
+
+                label.appendChild(checkbox);
+                label.appendChild(document.createTextNode(`${u.name} (${u.role})`));
+                div.appendChild(label);
+                usersChecklist.appendChild(div);
             });
         } catch (e) { console.error(e); }
     }
@@ -114,8 +135,25 @@ document.addEventListener('DOMContentLoaded', function () {
             availSelect.value = data.availability_status || 'AVAILABLE';
             remarksInput.value = data.remarks || '';
 
-            if (data.assigned_user_id) {
-                assignedUserSelect.value = data.assigned_user_id;
+            // Pre-select users
+            if (data.assigned_users && data.assigned_users.length > 0) {
+                // Collect IDs
+                const assignedIds = new Set(data.assigned_users.map(u => parseInt(u.id)));
+
+                // Tick checkboxes
+                const checkboxes = usersChecklist.querySelectorAll('input[type="checkbox"]');
+                checkboxes.forEach(cb => {
+                    if (assignedIds.has(parseInt(cb.value))) {
+                        cb.checked = true;
+                    }
+                });
+            } else if (data.assigned_user_id) { // Fallback for old single-user data
+                const checkboxes = usersChecklist.querySelectorAll('input[type="checkbox"]');
+                checkboxes.forEach(cb => {
+                    if (parseInt(cb.value) === parseInt(data.assigned_user_id)) {
+                        cb.checked = true;
+                    }
+                });
             }
 
             originalQtyDisplay.textContent = data.quantity;
@@ -164,10 +202,10 @@ document.addEventListener('DOMContentLoaded', function () {
         // B. Toggle Assigned User (IN USE only)
         if (currentAvail === 'IN USE') {
             assignedUserGroup.style.display = 'block';
-            assignedUserSelect.setAttribute('required', 'required');
+            // assignedUserSelect.setAttribute('required', 'required'); // Logic moved to submit
         } else {
             assignedUserGroup.style.display = 'none';
-            assignedUserSelect.removeAttribute('required');
+            // assignedUserSelect.removeAttribute('required');
         }
 
         // C. N.G Validation Warning (Visual)
@@ -224,7 +262,17 @@ document.addEventListener('DOMContentLoaded', function () {
         const currentAvail = availSelect.value;
         if (currentStatus === 'N.G' && currentAvail !== 'NOT AVAILABLE') {
             alert("You cannot make this item available for use.");
+            alert("You cannot make this item available for use.");
             return;
+        }
+
+        // Validate Assigned Users if IN USE
+        if (currentAvail === 'IN USE') {
+            const checkedBoxes = usersChecklist.querySelectorAll('input[type="checkbox"]:checked');
+            if (checkedBoxes.length === 0) {
+                alert("Please select at least one user who is using this item.");
+                return;
+            }
         }
 
         const formData = new FormData(form);

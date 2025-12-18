@@ -181,9 +181,24 @@ document.addEventListener('DOMContentLoaded', function () {
             </a>
         `;
 
+        // Users Button (Visible if users assigned)
+        let usersBtn = '';
+        if (item.assigned_users && item.assigned_users.length > 0) {
+            // Encode data safely
+            const usersJson = JSON.stringify(item.assigned_users).replace(/'/g, "&apos;").replace(/"/g, "&quot;");
+            usersBtn = `
+                <button type="button" class="btn-icon-action users-btn" data-users="${usersJson}" title="View Users" style="color: #2563eb;">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                </button>
+            `;
+        }
+
         if (canEdit && !isRestricted) {
             // Normal Edit/Delete for Owners/Admins
             actionsHtml = `
+                ${usersBtn}
                 ${reportBtn}
                 <a href="edit_inventory.html?id=${item.id}" class="btn-icon-action edit" title="Edit">
                     <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -199,6 +214,7 @@ document.addEventListener('DOMContentLoaded', function () {
         } else if (isRestricted) {
             // RESTRICTED EDIT for Staff on Available Items
             actionsHtml = `
+                ${usersBtn}
                 ${reportBtn}
                 <a href="#" class="btn-icon-action edit restricted-action" title="Edit">
                     <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -214,6 +230,7 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             // Read Only users
             actionsHtml = `
+                ${usersBtn}
                 ${reportBtn}
             `;
         }
@@ -243,10 +260,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         <span class="card-status ${statusClass}">${item.status_condition}</span>
                         <span class="card-status ${availClass}" style="margin-left:0.5rem;">${availText}</span>
                     </div>
-                    ${(item.availability_status === 'IN USE' && item.assigned_user) ?
+                    ${(item.availability_status === 'IN USE' && item.assigned_users && item.assigned_users.length > 0) ?
                 `<div style="color: #1e40af; font-size: 0.85rem; margin-top: 0.25rem; font-weight: 500;">
                             <svg style="width:14px;height:14px;vertical-align:text-bottom;margin-right:2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                            ${item.assigned_user.firstname} ${item.assigned_user.lastname}
+                            ${item.assigned_users.map(u => u.firstname + ' ' + u.lastname).join(', ')}
                          </div>`
                 : ''}
                     <div class="remarks-wrapper">
@@ -347,6 +364,57 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
         });
+    });
+
+    // Users Modal Logic
+    const usersModal = document.getElementById('users-modal');
+    const modalUsersBody = document.getElementById('modal-users-table-body');
+    const closeUsersModalBtn = document.getElementById('close-users-modal');
+    const closeUsersModalBtnSec = document.getElementById('close-modal-btn-secondary');
+
+    function closeUsersModal() {
+        if (usersModal) usersModal.style.display = 'none';
+        if (modalUsersBody) modalUsersBody.innerHTML = '';
+    }
+
+    if (closeUsersModalBtn) closeUsersModalBtn.addEventListener('click', closeUsersModal);
+    if (closeUsersModalBtnSec) closeUsersModalBtnSec.addEventListener('click', closeUsersModal);
+
+    // Close on background click
+    if (usersModal) {
+        usersModal.addEventListener('click', function (e) {
+            if (e.target === usersModal) closeUsersModal();
+        });
+    }
+
+    $(document).on('click', '.users-btn', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        try {
+            const users = JSON.parse($(this).attr('data-users'));
+            if (modalUsersBody) {
+                modalUsersBody.innerHTML = '';
+                if (users && users.length > 0) {
+                    users.forEach(u => {
+                        const tr = document.createElement('tr');
+                        tr.style.borderBottom = '1px solid #f3f4f6';
+                        tr.innerHTML = `
+                            <td style="padding: 0.5rem; color: #111827; font-size: 0.875rem;">${u.firstname} ${u.lastname}</td>
+                            <td style="padding: 0.5rem; color: #6b7280; font-size: 0.875rem; text-transform: capitalize;">${u.role}</td>
+                        `;
+                        modalUsersBody.appendChild(tr);
+                    });
+                } else {
+                    modalUsersBody.innerHTML = '<tr><td colspan="2" style="padding: 1rem; text-align: center; color: #6b7280;">No users assigned.</td></tr>';
+                }
+            }
+            if (usersModal) {
+                usersModal.style.display = 'flex'; // Use flex for centering logic in CSS
+            }
+        } catch (err) {
+            console.error('Error parsing user data', err);
+        }
     });
 
     // B. Create/Update Form Handling (Targeting #inventory-form usually found in Add/Edit pages)
