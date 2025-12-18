@@ -393,11 +393,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 modalUsersBody.innerHTML = '';
                 if (users && users.length > 0) {
                     users.forEach(u => {
-                        const tr = document.createElement('tr');
-                        tr.style.borderBottom = '1px solid #f3f4f6';
+                        const qty = (u.pivot && u.pivot.quantity) ? u.pivot.quantity : (u.quantity || 1);
                         tr.innerHTML = `
                             <td style="padding: 0.5rem; color: #111827; font-size: 0.875rem;">${u.firstname} ${u.lastname}</td>
-                            <td style="padding: 0.5rem; color: #6b7280; font-size: 0.875rem; text-transform: capitalize;">${u.role}</td>
+                            <td style="padding: 0.5rem; color: #374151; font-size: 0.875rem; text-align: center;">${qty}</td>
+                            <td style="padding: 0.5rem; color: #6b7280; font-size: 0.875rem; text-transform: capitalize; text-align: right;">${u.role}</td>
                         `;
                         modalUsersBody.appendChild(tr);
                     });
