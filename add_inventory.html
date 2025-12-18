@@ -13,6 +13,7 @@
 
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
     <!-- Config (Must be loaded first) -->
     <script src="js/config.js?v=2"></script>
 
@@ -186,35 +187,43 @@
                                 </div>
 
                                 <!-- Status -->
-                                <div>
-                                    <label class="form-label">Status Condition</label>
-                                    <select name="status_condition" id="status_condition" class="form-select" required>
-                                        <option value="GOOD">GOOD</option>
-                                        <option value="NEEDS ATTENTION">NEEDS ATTENTION</option>
-                                        <option value="N.G">N.G</option>
-                                    </select>
-                                </div>
+                                <label class="form-label">Status Condition</label>
+                                <select name="status_condition" id="status_condition" class="form-select" required>
+                                    <option value="GOOD">GOOD</option>
+                                    <option value="NEEDS ATTENTION">NEEDS ATTENTION</option>
+                                    <option value="N.G">N.G</option>
+                                </select>
+                            </div>
 
-                                <!-- Remarks (Conditional) -->
-                                <div id="remarks-group" style="display: none;">
-                                    <label class="form-label">Remarks</label>
-                                    <textarea name="remarks" class="form-input"
-                                        placeholder="Please specify the issue..." rows="3"></textarea>
-                                </div>
+                            <!-- Availability (New) -->
+                            <div>
+                                <label class="form-label">Availability Status</label>
+                                <select name="availability_status" id="availability_status" class="form-select"
+                                    required>
+                                    <option value="AVAILABLE">AVAILABLE</option>
+                                    <option value="IN USE">IN USE</option>
+                                    <option value="NOT AVAILABLE">NOT AVAILABLE</option>
+                                </select>
+                            </div>
+
+                            <!-- Remarks (Conditional) -->
+                            <div id="remarks-group" style="display: none;">
+                                <label class="form-label">Remarks</label>
+                                <textarea name="remarks" class="form-input" placeholder="Please specify the issue..."
+                                    rows="3"></textarea>
                             </div>
                         </div>
-
-                        <div class="form-actions">
-                            <a href="inventories.html" class="btn-cancel">Cancel</a>
-                            <button type="submit" class="btn-submit">Save Inventory Item</button>
-                        </div>
-                    </form>
                 </div>
-            </main>
+
+                <div class="form-actions">
+                    <a href="inventories.html" class="btn-cancel">Cancel</a>
+                    <button type="submit" class="btn-submit">Save Inventory Item</button>
+                </div>
+                </form>
         </div>
+        </main>
+    </div>
     </div>
 </body>
 
-
 </html>
-
