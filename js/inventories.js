@@ -243,6 +243,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         <span class="card-status ${statusClass}">${item.status_condition}</span>
                         <span class="card-status ${availClass}" style="margin-left:0.5rem;">${availText}</span>
                     </div>
+                    ${(item.availability_status === 'IN USE' && item.assigned_user) ?
+                `<div style="color: #1e40af; font-size: 0.85rem; margin-top: 0.25rem; font-weight: 500;">
+                            <svg style="width:14px;height:14px;vertical-align:text-bottom;margin-right:2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                            ${item.assigned_user.firstname} ${item.assigned_user.lastname}
+                         </div>`
+                : ''}
                     <div class="remarks-wrapper">
                          <div style="overflow: hidden; white-space: nowrap;">
                             <span class="remarks-text" style="display: inline-block; padding-left: 0; animation: marquee 10s linear infinite;">Remarks: ${item.remarks || 'NONE'}</span>
