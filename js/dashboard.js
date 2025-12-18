@@ -56,7 +56,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const dashboardDataUrl = CONFIG.apiUrl('/api/dashboard/data'); // Adjust if route usage differs
 
     // Only fetch if we are actually on the dashboard (check for an element unique to it)
-    if (document.getElementById('chart-circle')) {
+    // We check for the admin view container or any other dashboard specific element
+    if (document.getElementById('admin-view') || document.getElementById('chart-circle')) {
         fetchDashboardData();
     }
 
@@ -79,6 +80,26 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function renderDashboard(data) {
+        const role = data.role || 'user'; // Default to user if undefined
+        
+        // Hide all views first
+        $('#admin-view').hide();
+        $('#staff-view').hide();
+        $('#user-view').hide();
+
+        if (role === 'admin') {
+            $('#admin-view').show();
+            renderAdminDashboard(data);
+        } else if (role === 'staff') {
+            $('#staff-view').show();
+            renderStaffDashboard(data);
+        } else {
+            $('#user-view').show();
+            renderUserDashboard(data);
+        }
+    }
+
+    function renderAdminDashboard(data) {
         // --- Calculate Stats for Top Row ---
         const stats = data.stats || {};
         const total = data.totalInventories || 0;
@@ -171,6 +192,128 @@ document.addEventListener('DOMContentLoaded', function () {
         // 4. Chart Statistics
         renderChart(data, goodCount, attentionCount, ngCount, total);
     }
+
+    function renderStaffDashboard(data) {
+        // --- Card 1: Stats ---
+        const stats = data.myStats || {};
+        const total = data.totalOwnedInventories || 0;
+        const good = (stats['GOOD'] || 0) + (stats['Good Condition'] || 0);
+        const attention = (stats['NEEDS ATTENTION'] || 0) + (stats['Needs Attention Condition'] || 0) + (stats['Needs Repair'] || 0);
+        const ng = (stats['N.G'] || 0) + (stats['N.G. Condition'] || 0) + (stats['Broken'] || 0);
+
+        $('#staff-total-assets').text(total);
+        $('#staff-good').text(good);
+        $('#staff-attention').text(attention);
+        $('#staff-ng').text(ng);
+
+        // --- Card 2: Assigned Rooms ---
+        const roomsBody = document.getElementById('staff-rooms-body');
+        if (roomsBody) {
+            roomsBody.innerHTML = '';
+            if (data.assignedRooms && data.assignedRooms.length > 0) {
+                data.assignedRooms.forEach(room => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="font-medium text-dark">${room.room_name}</td>
+                        <td class="text-center"><span class="badge badge-blue">${room.inventories_count}</span></td>
+                    `;
+                    roomsBody.appendChild(tr);
+                });
+            } else {
+                roomsBody.innerHTML = '<tr><td colspan="2" class="text-secondary text-center">No assigned rooms</td></tr>';
+            }
+        }
+
+        // --- Card 3: Recent Inventories (In My Rooms) ---
+        const recentBody = document.getElementById('staff-recent-body');
+        if (recentBody) {
+            recentBody.innerHTML = '';
+            if (data.recentInventories && data.recentInventories.length > 0) {
+                data.recentInventories.forEach(item => {
+                    const tr = document.createElement('tr');
+                    const statusClass = item.status_condition === 'GOOD' ? 'text-green-600' : 'text-yellow-600';
+                    tr.innerHTML = `
+                        <td class="font-medium text-dark">${item.inventory_name}</td>
+                        <td class="${statusClass}">${item.status_condition}</td>
+                    `;
+                    recentBody.appendChild(tr);
+                });
+            } else {
+                recentBody.innerHTML = '<tr><td colspan="2" class="text-secondary text-center">No recent inventories</td></tr>';
+            }
+        }
+
+        // --- Card 4: My Reported Issues ---
+        const reportsBody = document.getElementById('staff-reports-body');
+        if (reportsBody) {
+            reportsBody.innerHTML = '';
+            if (data.myReports && data.myReports.length > 0) {
+                data.myReports.forEach(report => {
+                    const tr = document.createElement('tr');
+                    const invName = report.inventory ? report.inventory.inventory_name : 'Unknown';
+                    tr.innerHTML = `
+                        <td class="font-medium text-dark">${invName}</td>
+                        <td class="text-secondary text-sm">${report.remarks}</td>
+                    `;
+                    reportsBody.appendChild(tr);
+                });
+            } else {
+                reportsBody.innerHTML = '<tr><td colspan="2" class="text-secondary text-center">No reports submitted</td></tr>';
+            }
+        }
+    }
+
+    function renderUserDashboard(data) {
+        const grid = document.getElementById('user-inventory-grid');
+        if (grid) {
+            grid.innerHTML = '';
+            if (data.availableInventories && data.availableInventories.length > 0) {
+                data.availableInventories.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'content-card p-3 flex flex-col justify-between';
+                    card.style.minHeight = '140px';
+                    
+                    const imgUrl = item.inventory_photo ? CONFIG.apiUrl(item.inventory_photo) : 'images/default-item.png';
+                    const roomName = item.room ? item.room.room_name : 'No Room';
+
+                    card.innerHTML = `
+                        <div class="mb-2">
+                            <h4 class="font-medium text-dark text-sm truncate" title="${item.inventory_name}">${item.inventory_name}</h4>
+                            <p class="text-xs text-secondary truncate">${roomName}</p>
+                        </div>
+                        <div class="flex items-center justify-between mt-auto">
+                            <span class="text-xs font-bold ${getStatusColor(item.status_condition)}">${item.status_condition}</span>
+                            <button class="btn-icon-sm text-red-500 hover:bg-red-50" onclick="openReportModal(${item.id}, '${item.inventory_name}')" title="Report Issue">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            } else {
+                grid.innerHTML = '<p class="text-secondary text-center col-span-full py-4">No inventories available.</p>';
+            }
+        }
+    }
+
+    function getStatusColor(status) {
+        if (!status) return 'text-secondary';
+        const s = status.toUpperCase();
+        if (s.includes('GOOD')) return 'text-green-600';
+        if (s.includes('ATTENTION') || s.includes('REPAIR')) return 'text-yellow-600';
+        return 'text-red-600';
+    }
+
+    // Helper for Report Modal (Should already exist or need link)
+    window.openReportModal = function(invId, invName) {
+        // Redirect to reports page with pre-fill params? 
+        // Or simpler: just go to reports page. 
+        // User requested "Report Icons", assuming they link to report functionality.
+        // For now, let's redirect to reports.html with query params
+        window.location.href = `reports.html?action=report&inventory_id=${invId}&inventory_name=${encodeURIComponent(invName)}`;
+    };
 
     function renderChart(data, goodCount, attentionCount, ngCount, total) {
         // Safety for div
