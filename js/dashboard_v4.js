@@ -82,6 +82,9 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log('Dashboard Data Received:', data); // DEBUG
         console.log('In Use Count:', data.inUseInventories ? data.inUseInventories.length : 'Undefined'); // DEBUG
 
+        // --- Aggressive Debugging ---
+        alert("Dashboard Loaded! Role: " + data.role);
+
         // --- View Switching Logic ---
         // Hide all first (safety)
         ['admin-view', 'staff-view', 'user-view'].forEach(id => {
@@ -91,13 +94,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Show active view
         if (data.role === 'admin') {
+            alert("Showing Admin View"); // Proof of logic
             const el = document.getElementById('admin-view');
             if (el) el.style.display = 'block';
         } else if (data.role === 'staff') {
+            alert("Showing Staff View");
             const el = document.getElementById('staff-view');
             if (el) el.style.display = 'block';
         } else {
             // Default to User view
+            alert("Showing User View");
             const el = document.getElementById('user-view');
             if (el) el.style.display = 'block';
         }
