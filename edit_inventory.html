@@ -184,15 +184,34 @@
                                     </div>
                                 </div>
 
-                                <!-- Assigned Users (Hidden by default) -->
+                                <!-- Assigned Users (Conditional: IN USE) -->
                                 <div id="assigned-user-group" style="display: none;">
-                                    <label class="form-label">Assigned Users</label>
-                                    <div id="users-checklist"
-                                        style="max-height: 200px; overflow-y: auto; border: 1px solid #d1d5db; border-radius: 0.375rem; padding: 0.5rem; background: #fff;">
-                                        <!-- Checkboxes injected by JS -->
-                                        <div style="color:#6b7280; font-size:0.9rem;">Loading users...</div>
+                                    <label class="form-label" style="font-weight: 600; color: #374151;">USED BY:</label>
+
+                                    <!-- User Selector Row -->
+                                    <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                        <div style="flex-grow: 1;">
+                                            <select id="user-select-dropdown" class="form-select" style="width: 100%;">
+                                                <option value="">-- Select a User --</option>
+                                            </select>
+                                        </div>
+                                        <button type="button" id="add-user-btn" class="btn-primary"
+                                            style="padding: 0.5rem 1rem; width: auto; flex-shrink: 0;"> + Add </button>
                                     </div>
-                                    <small style="color: #6b7280;">Select all users who are using this item.</small>
+
+                                    <!-- Dynamic List of Users -->
+                                    <div id="users-assignment-list"
+                                        style="display: flex; flex-direction: column; gap: 0.5rem; border-top: 1px solid #e5e7eb; padding-top: 0.5rem;">
+                                        <!-- Javascript will populate rows here: 
+                                             Format: [Name] [Qty Input] [Remove Btn] 
+                                        -->
+                                        <div id="no-users-msg"
+                                            style="color: #9ca3af; font-size: 0.875rem; font-style: italic; text-align: center; padding: 0.5rem;">
+                                            No users assigned yet.
+                                        </div>
+                                    </div>
+                                    <small style="color: #6b7280; display: block; margin-top: 0.5rem;">Assign quantities
+                                        to specific users. Total must match item quantity.</small>
                                 </div>
 
                                 <!-- SPLIT / MOVE UI (Hidden by default) -->
