@@ -393,6 +393,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 modalUsersBody.innerHTML = '';
                 if (users && users.length > 0) {
                     users.forEach(u => {
+                        const tr = document.createElement('tr');
                         const qty = (u.pivot && u.pivot.quantity) ? u.pivot.quantity : (u.quantity || 1);
                         tr.innerHTML = `
                             <td style="padding: 0.5rem; color: #111827; font-size: 0.875rem;">${u.firstname} ${u.lastname}</td>
