@@ -17,6 +17,7 @@
 
     <!-- Auth Guard (Handles 401 & Token) -->
     <script src="js/auth-guard.js?v=2"></script>
+
     <script src="js/dashboard.js?v=2"></script>
 </head>
 
@@ -136,150 +137,273 @@
 
             <!-- Main Content -->
             <main class="content-area">
-                <div class="dashboard-header mb-4">
-                    <h1 class="page-title">System Overview</h1>
-                    <p class="text-secondary text-sm">Real-time asset tracking statistics</p>
-                </div>
-
-                <!-- Top Stats Row -->
-                <div class="stats-overview">
-                    <!-- 1. Total -->
-                    <div class="mini-stat-card">
-                        <div class="stat-icon bg-blue-100 text-blue-600">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                            </svg>
-                        </div>
-                        <div class="stat-info">
-                            <span class="stat-label">Total Assets</span>
-                            <span class="stat-value" id="stat-total-assets">--</span>
-                        </div>
+                <!-- ============================================ -->
+                <!-- ADMIN VIEW (Existing) -->
+                <!-- ============================================ -->
+                <div id="admin-view" style="display: none;">
+                    <div class="dashboard-header mb-4">
+                        <h1 class="page-title">System Overview</h1>
+                        <p class="text-secondary text-sm">Real-time asset tracking statistics</p>
                     </div>
 
-                    <!-- 2. Good (Green) -->
-                    <div class="mini-stat-card">
-                        <div class="stat-icon bg-green-100 text-green-600">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                        </div>
-                        <div class="stat-info">
-                            <span class="stat-label">Good Condition</span>
-                            <span class="stat-value" id="stat-good">--</span>
-                        </div>
-                    </div>
-
-                    <!-- 3. Attention (Yellow) -->
-                    <div class="mini-stat-card">
-                        <div class="stat-icon bg-yellow-100 text-yellow-600">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
-                                </path>
-                            </svg>
-                        </div>
-                        <div class="stat-info">
-                            <span class="stat-label">Attention Needed</span>
-                            <span class="stat-value" id="stat-attention">--</span>
-                        </div>
-                    </div>
-
-                    <!-- 4. Not Good (Red) -->
-                    <div class="mini-stat-card">
-                        <div class="stat-icon bg-red-100 text-red-600">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                        </div>
-                        <div class="stat-info">
-                            <span class="stat-label">Not Good</span>
-                            <span class="stat-value" id="stat-ng">--</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Main Split Layout -->
-                <div class="dashboard-split mt-4">
-
-                    <!-- Left Column (Priority Data) -->
-                    <div class="split-left">
-                        <!-- Critical Issues -->
-                        <div class="content-card mb-4">
-                            <div class="card-header-compact">
-                                <h3>⚠️ Reported Issues</h3>
-                                <a href="reports.html" class="text-sm text-primary">View All</a>
+                    <!-- Top Stats Row -->
+                    <div class="stats-overview">
+                        <!-- 1. Total -->
+                        <div class="mini-stat-card">
+                            <div class="stat-icon bg-blue-100 text-blue-600">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                </svg>
                             </div>
-                            <div class="table-responsive">
-                                <table class="data-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Asset Name</th>
-                                            <th>Remarks / Issue</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="problem-inventories-body">
-                                        <!-- Populated by JS -->
-                                    </tbody>
-                                </table>
+                            <div class="stat-info">
+                                <span class="stat-label">Total Assets</span>
+                                <span class="stat-value" id="stat-total-assets">--</span>
                             </div>
                         </div>
 
-                        <!-- Recent Additions -->
-                        <div class="content-card">
-                            <div class="card-header-compact">
-                                <h3>Recently Added Assets</h3>
+                        <!-- 2. Good (Green) -->
+                        <div class="mini-stat-card">
+                            <div class="stat-icon bg-green-100 text-green-600">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
                             </div>
-                            <div class="table-responsive">
-                                <table class="data-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Asset Name</th>
-                                            <th>Date Added</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="new-inventories-body">
-                                        <!-- Populated by JS -->
-                                    </tbody>
-                                </table>
+                            <div class="stat-info">
+                                <span class="stat-label">Good Condition</span>
+                                <span class="stat-value" id="stat-good">--</span>
+                            </div>
+                        </div>
+
+                        <!-- 3. Attention (Yellow) -->
+                        <div class="mini-stat-card">
+                            <div class="stat-icon bg-yellow-100 text-yellow-600">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                                    </path>
+                                </svg>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-label">Attention Needed</span>
+                                <span class="stat-value" id="stat-attention">--</span>
+                            </div>
+                        </div>
+
+                        <!-- 4. Not Good (Red) -->
+                        <div class="mini-stat-card">
+                            <div class="stat-icon bg-red-100 text-red-600">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-label">Not Good</span>
+                                <span class="stat-value" id="stat-ng">--</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Right Column (Summary & visual) -->
-                    <div class="split-right">
+                    <!-- Main Split Layout -->
+                    <div class="dashboard-split mt-4">
 
-                        <!-- Chart Card -->
-                        <div class="content-card mb-4 text-center">
-                            <div class="card-header-compact justify-center">
-                                <h3>Asset Health</h3>
-                            </div>
-                            <div class="chart-wrapper py-2">
-                                <div class="chart-circle" id="chart-circle">
-                                    <div class="chart-inner">
-                                        <span class="chart-total" id="chart-total-label">0</span>
-                                        <span class="chart-label">Assets</span>
-                                    </div>
+                        <!-- Left Column (Priority Data) -->
+                        <div class="split-left">
+                            <!-- Critical Issues -->
+                            <div class="content-card mb-4">
+                                <div class="card-header-compact">
+                                    <h3>⚠️ Reported Issues</h3>
+                                    <a href="reports.html" class="text-sm text-primary">View All</a>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="data-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Asset Name</th>
+                                                <th>Remarks / Issue</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="problem-inventories-body">
+                                            <!-- Populated by JS -->
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
-                            <div id="chart-legend" class="chart-legend px-4">
-                                <!-- Populated by JS -->
+
+                            <!-- Recent Additions -->
+                            <div class="content-card">
+                                <div class="card-header-compact">
+                                    <h3>Recently Added Assets</h3>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="data-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Asset Name</th>
+                                                <th>Date Added</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="new-inventories-body">
+                                            <!-- Populated by JS -->
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- New Users Card -->
-                        <div class="content-card" id="card-new-users" style="display: none;">
-                            <div class="card-header-compact">
-                                <h3>New Users</h3>
+                        <!-- Right Column (Summary & visual) -->
+                        <div class="split-right">
+
+                            <!-- Chart Card -->
+                            <div class="content-card mb-4 text-center">
+                                <div class="card-header-compact justify-center">
+                                    <h3>Asset Health</h3>
+                                </div>
+                                <div class="chart-wrapper py-2">
+                                    <div class="chart-circle" id="chart-circle">
+                                        <div class="chart-inner">
+                                            <span class="chart-total" id="chart-total-label">0</span>
+                                            <span class="chart-label">Assets</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="chart-legend" class="chart-legend px-4">
+                                    <!-- Populated by JS -->
+                                </div>
                             </div>
-                            <ul class="user-list" id="new-users-list">
-                                <!-- Populated by JS -->
-                            </ul>
+
+                            <!-- New Users Card -->
+                            <div class="content-card" id="card-new-users" style="display: none;">
+                                <div class="card-header-compact">
+                                    <h3>New Users</h3>
+                                </div>
+                                <ul class="user-list" id="new-users-list">
+                                    <!-- Populated by JS -->
+                                </ul>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ============================================ -->
+                <!-- STAFF VIEW -->
+                <!-- ============================================ -->
+                <div id="staff-view" style="display: none;">
+                    <div class="dashboard-header mb-4">
+                        <h1 class="page-title">Staff Dashboard</h1>
+                        <p class="text-secondary text-sm">Overview of your assigned areas</p>
+                    </div>
+
+                    <!-- CARD 1: My Inventory Stats -->
+                    <div class="stats-overview mb-4">
+                        <div class="mini-stat-card">
+                            <div class="stat-info">
+                                <span class="stat-label">Your Managed Assets</span>
+                                <span class="stat-value" id="staff-total-assets">--</span>
+                            </div>
+                        </div>
+                        <div class="mini-stat-card">
+                            <div class="stat-info">
+                                <span class="stat-label text-green-600">Good</span>
+                                <span class="stat-value text-green-600" id="staff-good">--</span>
+                            </div>
+                        </div>
+                        <div class="mini-stat-card">
+                            <div class="stat-info">
+                                <span class="stat-label text-yellow-600">Attention</span>
+                                <span class="stat-value text-yellow-600" id="staff-attention">--</span>
+                            </div>
+                        </div>
+                        <div class="mini-stat-card">
+                            <div class="stat-info">
+                                <span class="stat-label text-red-600">Not Good</span>
+                                <span class="stat-value text-red-600" id="staff-ng">--</span>
+                            </div>
                         </div>
                     </div>
 
+                    <!-- CARD 2: Assigned Rooms -->
+                    <div class="content-card mb-4">
+                        <div class="card-header-compact">
+                            <h3>Assigned Rooms</h3>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Room Name</th>
+                                        <th class="text-center">Inventories</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="staff-rooms-body">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- ROW: Card 3 & 4 -->
+                    <div class="dashboard-split">
+                        <!-- CARD 3: Recent Added (Your Rooms) -->
+                        <div class="split-left">
+                            <div class="content-card mb-4">
+                                <div class="card-header-compact">
+                                    <h3>Recent Additions (Your Rooms)</h3>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="data-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Inventory</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="staff-recent-body">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CARD 4: Your Reported Issues -->
+                        <div class="split-right">
+                            <div class="content-card mb-4">
+                                <div class="card-header-compact">
+                                    <h3>Your Reported Issues</h3>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="data-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Inventory</th>
+                                                <th>Issue</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="staff-reports-body">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ============================================ -->
+                <!-- USER VIEW -->
+                <!-- ============================================ -->
+                <div id="user-view" style="display: none;">
+                    <div class="dashboard-header mb-4">
+                        <h1 class="page-title">Available Inventories</h1>
+                        <p class="text-secondary text-sm">Browse assets and report issues</p>
+                    </div>
+
+                    <!-- Grid of Small Cards (350px friendly) -->
+                    <div class="inventory-grid" id="user-inventory-grid" 
+                         style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 1rem;">
+                        <!-- Populated by JS -->
+                    </div>
                 </div>
 
             </main>
