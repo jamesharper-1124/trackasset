@@ -82,6 +82,26 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log('Dashboard Data Received:', data); // DEBUG
         console.log('In Use Count:', data.inUseInventories ? data.inUseInventories.length : 'Undefined'); // DEBUG
 
+        // --- View Switching Logic ---
+        // Hide all first (safety)
+        ['admin-view', 'staff-view', 'user-view'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = 'none';
+        });
+
+        // Show active view
+        if (data.role === 'admin') {
+            const el = document.getElementById('admin-view');
+            if (el) el.style.display = 'block';
+        } else if (data.role === 'staff') {
+            const el = document.getElementById('staff-view');
+            if (el) el.style.display = 'block';
+        } else {
+            // Default to User view
+            const el = document.getElementById('user-view');
+            if (el) el.style.display = 'block';
+        }
+
         // --- Calculate Stats for Top Row ---
         const stats = data.stats || {};
         const total = data.totalInventories || 0;
@@ -256,4 +276,3 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 });
- 
