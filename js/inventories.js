@@ -165,6 +165,11 @@ document.addEventListener('DOMContentLoaded', function () {
         if (item.status_condition === 'NEEDS ATTENTION') statusClass = 'status-fair';
         if (item.status_condition === 'N.G') statusClass = 'status-danger';
 
+        let availClass = 'status-available';
+        const availText = (item.availability_status || 'AVAILABLE').toUpperCase();
+        if (availText === 'IN USE') availClass = 'status-in-use';
+        if (availText === 'NOT AVAILABLE') availClass = 'status-not-available';
+
         let actionsHtml = '';
 
         // Report Button (Always Visible)
@@ -192,8 +197,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 </button>
             `;
         } else if (isRestricted) {
-            // RESTRICTED EDIT for Staff on Available items
-            // Looks like buttons, but different class/behavior
+            // RESTRICTED EDIT for Staff on Available Items
             actionsHtml = `
                 ${reportBtn}
                 <a href="#" class="btn-icon-action edit restricted-action" title="Edit">
@@ -235,11 +239,11 @@ document.addEventListener('DOMContentLoaded', function () {
                             Qty: ${item.quantity}
                         </span>
                     </div>
-                    <div class="status-wrapper">
+                     <div class="status-wrapper">
                         <span class="card-status ${statusClass}">${item.status_condition}</span>
+                        <span class="card-status ${availClass}" style="margin-left:0.5rem;">${availText}</span>
                     </div>
                     <div class="remarks-wrapper">
-                        <!-- 'marquee-animation' class is defined in inventories.css -->
                          <div style="overflow: hidden; white-space: nowrap;">
                             <span class="remarks-text" style="display: inline-block; padding-left: 0; animation: marquee 10s linear infinite;">Remarks: ${item.remarks || 'NONE'}</span>
                          </div>
