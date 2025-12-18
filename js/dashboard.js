@@ -79,6 +79,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function renderDashboard(data) {
+        console.log('Dashboard Data Received:', data); // DEBUG
+        console.log('In Use Count:', data.inUseInventories ? data.inUseInventories.length : 'Undefined'); // DEBUG
+
         // --- Calculate Stats for Top Row ---
         const stats = data.stats || {};
         const total = data.totalInventories || 0;
