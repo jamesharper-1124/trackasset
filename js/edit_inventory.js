@@ -189,42 +189,15 @@ document.addEventListener('DOMContentLoaded', function () {
             assignedUserGroup.style.display = 'none';
         }
 
-        // D. Split Logic
-        const hasStatusChange = (currentStatus !== originalData.status) || (currentAvail !== originalData.avail);
-        const isMultiQty = (parseInt(originalData.qty) > 1);
+        // D. Split Logic (Hidden but Functional)
+        // We will default to split mode internally if assignments < total
+        // But visual "Split UI Group" is hidden as per user request.
+        splitUiGroup.style.display = 'none';
+        splitQtyGroup.style.display = 'none'; // Ensure this is hidden
 
-        if (hasStatusChange && isMultiQty) {
-            splitUiGroup.style.display = 'block';
-        } else {
-            splitUiGroup.style.display = 'none';
-            document.querySelector('input[name="move_mode"][value="all"]').checked = true;
-        }
-
-        // Check Move Mode
-        const moveMode = document.querySelector('input[name="move_mode"]:checked').value;
-        if (moveMode === 'split') {
-            splitQtyGroup.style.display = 'block';
-            splitQtyInput.setAttribute('required', 'required');
-            // If IN USE, splitQty is ReadOnly, controlled by user list
-            if (currentAvail === 'IN USE') {
-                splitQtyInput.readOnly = true;
-            } else {
-                splitQtyInput.readOnly = false;
-                splitQtyInput.setAttribute('max', originalData.qty - 1);
-            }
-        } else {
-            splitQtyGroup.style.display = 'none';
-            splitQtyInput.removeAttribute('required');
-            splitQtyInput.readOnly = false;
-            splitQtyInput.value = '';
-        }
-
-        // Dynamic Quantity Logic for Full Move as well
-        if (moveMode === 'all' && currentAvail === 'IN USE') {
-            qtyInput.readOnly = true;
-        } else if (moveMode === 'all') {
-            qtyInput.readOnly = false;
-        }
+        // Ensure split_quantity input is always enabled for programmatic update
+        splitQtyInput.removeAttribute('required'); // We manually validate
+        splitQtyInput.readOnly = false;
     }
 
     // --- Dynamic User Assignment Logic ---
@@ -294,19 +267,35 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function updateTotalQuantity() {
-        let total = 0;
-        Object.values(assignedUsersData).forEach(u => total += u.quantity);
+        let totalAssigned = 0;
+        Object.values(assignedUsersData).forEach(u => totalAssigned += u.quantity);
 
-        // Update either Split Qty or Main Qty depend on Mode
-        const moveMode = document.querySelector('input[name="move_mode"]:checked').value;
         const currentAvail = availSelect.value;
+        const totalOriginal = parseInt(originalData.qty) || 0;
 
         if (currentAvail === 'IN USE') {
-            if (moveMode === 'split') {
-                splitQtyInput.value = total;
+            // Logic: 
+            // - Update Hidden Split Qty Input with `totalAssigned`.
+            // - Update Main `qty` Input to show `Remaining` (Original - Assigned).
+            // - Switch Radio Mode: 
+            //    - If totalAssigned < totalOriginal: Mode = Split.
+            //    - If totalAssigned == totalOriginal: Mode = All.
+            //    - If totalAssigned > totalOriginal: Warn? We assume User logic overrides.
+
+            splitQtyInput.value = totalAssigned;
+
+            const remaining = totalOriginal - totalAssigned;
+            qtyInput.value = remaining >= 0 ? remaining : 0;
+
+            // Auto Mode Switch
+            if (totalAssigned > 0 && totalAssigned < totalOriginal) {
+                document.querySelector('input[name="move_mode"][value="split"]').checked = true;
             } else {
-                qtyInput.value = total;
+                document.querySelector('input[name="move_mode"][value="all"]').checked = true;
             }
+        } else {
+            // If NOT in use, just show full original or user edit?
+            if (qtyInput.value == 0) qtyInput.value = totalOriginal;
         }
     }
 
@@ -402,7 +391,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 alert('Inventory updated successfully!');
                 window.location.href = 'inventories.html';
             } else {
-                const errData = await response.json();
+                let errData;
+                try {
+                    errData = await response.json();
+                } catch (e) {
+                    errData = { message: 'Server returned an invalid response. Please check server logs.' };
+                }
                 console.error('Update failed:', errData);
                 alert('Failed to update inventory: ' + (errData.message || 'Unknown error'));
             }
