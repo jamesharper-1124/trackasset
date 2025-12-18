@@ -577,6 +577,21 @@ body {
     color: #991b1b;
 }
 
+.status-available {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.status-in-use {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+.status-not-available {
+    background-color: #f3f4f6;
+    color: #374151;
+}
+
 /* ---- FORMS (ADD / EDIT) ---- */
 .form-container {
     background: white;
