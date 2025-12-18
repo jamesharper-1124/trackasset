@@ -81,32 +81,18 @@ document.addEventListener('DOMContentLoaded', function () {
             });
             if (!response.ok) throw new Error('Failed to load users');
             const data = await response.json();
-            usersChecklist.innerHTML = '';
+            userSelectDropdown.innerHTML = '<option value="">-- Select a User --</option>';
 
             if (data.length === 0) {
-                usersChecklist.innerHTML = '<div style="color:#6b7280; font-size:0.9rem;">No users found.</div>';
+                // userSelectDropdown.disabled = true;
                 return;
             }
 
             data.forEach(u => {
-                const div = document.createElement('div');
-                div.style.marginBottom = '0.25rem';
-
-                const label = document.createElement('label');
-                label.style.display = 'flex';
-                label.style.alignItems = 'center';
-                label.style.cursor = 'pointer';
-
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.name = 'assigned_user_ids[]';
-                checkbox.value = u.id;
-                checkbox.style.marginRight = '0.5rem';
-
-                label.appendChild(checkbox);
-                label.appendChild(document.createTextNode(`${u.name} (${u.role})`));
-                div.appendChild(label);
-                usersChecklist.appendChild(div);
+                const opt = document.createElement('option');
+                opt.value = u.id;
+                opt.textContent = `${u.name} (${u.role})`;
+                userSelectDropdown.appendChild(opt);
             });
         } catch (e) { console.error(e); }
     }
@@ -137,24 +123,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Pre-select users
             if (data.assigned_users && data.assigned_users.length > 0) {
-                // Collect IDs
-                const assignedIds = new Set(data.assigned_users.map(u => parseInt(u.id)));
-
-                // Tick checkboxes
-                const checkboxes = usersChecklist.querySelectorAll('input[type="checkbox"]');
-                checkboxes.forEach(cb => {
-                    if (assignedIds.has(parseInt(cb.value))) {
-                        cb.checked = true;
-                    }
+                data.assigned_users.forEach(u => {
+                    const qty = (u.pivot && u.pivot.quantity) ? u.pivot.quantity : 1;
+                    assignedUsersData[u.id] = {
+                        id: u.id,
+                        name: u.firstname + ' ' + u.lastname, // Assuming api returns full user object or close enough
+                        role: u.role,
+                        quantity: qty
+                    };
                 });
-            } else if (data.assigned_user_id) { // Fallback for old single-user data
-                const checkboxes = usersChecklist.querySelectorAll('input[type="checkbox"]');
-                checkboxes.forEach(cb => {
-                    if (parseInt(cb.value) === parseInt(data.assigned_user_id)) {
-                        cb.checked = true;
-                    }
-                });
+            } else if (data.assigned_user_id) { // Fallback (Legacy)
+                // We'd need to fetch user name or ignore. 
+                // Given we loaded users list, we might match ID?
+                // For now, assume modern structure.
             }
+            renderUserRows();
 
             originalQtyDisplay.textContent = data.quantity;
 
@@ -202,22 +185,11 @@ document.addEventListener('DOMContentLoaded', function () {
         // B. Toggle Assigned User (IN USE only)
         if (currentAvail === 'IN USE') {
             assignedUserGroup.style.display = 'block';
-            // assignedUserSelect.setAttribute('required', 'required'); // Logic moved to submit
         } else {
             assignedUserGroup.style.display = 'none';
-            // assignedUserSelect.removeAttribute('required');
-        }
-
-        // C. N.G Validation Warning (Visual)
-        if (currentStatus === 'N.G' && currentAvail !== 'NOT AVAILABLE') {
-            // We can auto-switch or just warn. User logic says "Prompt".
-            // We'll let submit handle the hard block, but maybe auto-set NOT AVAILABLE to be helpful?
-            // availSelect.value = 'NOT AVAILABLE'; // Auto-fix?
-            // User requested "Prompt", usually implies Alert on action. We'll leave it for Submit validation.
         }
 
         // D. Split Logic
-        // Check if Status OR Avail changed
         const hasStatusChange = (currentStatus !== originalData.status) || (currentAvail !== originalData.avail);
         const isMultiQty = (parseInt(originalData.qty) > 1);
 
@@ -225,7 +197,6 @@ document.addEventListener('DOMContentLoaded', function () {
             splitUiGroup.style.display = 'block';
         } else {
             splitUiGroup.style.display = 'none';
-            // Reset radio to 'all' if hiding
             document.querySelector('input[name="move_mode"][value="all"]').checked = true;
         }
 
@@ -234,13 +205,132 @@ document.addEventListener('DOMContentLoaded', function () {
         if (moveMode === 'split') {
             splitQtyGroup.style.display = 'block';
             splitQtyInput.setAttribute('required', 'required');
-            splitQtyInput.setAttribute('max', originalData.qty - 1); // Cannot move ALL (that's just 'apply to all')
+            // If IN USE, splitQty is ReadOnly, controlled by user list
+            if (currentAvail === 'IN USE') {
+                splitQtyInput.readOnly = true;
+            } else {
+                splitQtyInput.readOnly = false;
+                splitQtyInput.setAttribute('max', originalData.qty - 1);
+            }
         } else {
             splitQtyGroup.style.display = 'none';
             splitQtyInput.removeAttribute('required');
+            splitQtyInput.readOnly = false;
             splitQtyInput.value = '';
         }
+
+        // Dynamic Quantity Logic for Full Move as well
+        if (moveMode === 'all' && currentAvail === 'IN USE') {
+            qtyInput.readOnly = true;
+        } else if (moveMode === 'all') {
+            qtyInput.readOnly = false;
+        }
     }
+
+    // --- Dynamic User Assignment Logic ---
+    const userSelectDropdown = document.getElementById('user-select-dropdown');
+    const addUserBtn = document.getElementById('add-user-btn');
+    const usersListContainer = document.getElementById('users-assignment-list');
+    const noUsersMsg = document.getElementById('no-users-msg');
+
+    // Store selected users in memory: { userId: { name, quantity, role } }
+    let assignedUsersData = {};
+
+    function renderUserRows() {
+        usersListContainer.innerHTML = '';
+        const ids = Object.keys(assignedUsersData);
+
+        if (ids.length === 0) {
+            usersListContainer.appendChild(noUsersMsg);
+            noUsersMsg.style.display = 'block';
+        } else {
+            noUsersMsg.style.display = 'none';
+            ids.forEach(id => {
+                const u = assignedUsersData[id];
+                const row = document.createElement('div');
+                row.className = 'user-assign-row';
+                row.style.display = 'flex';
+                row.style.alignItems = 'center';
+                row.style.gap = '0.5rem';
+                row.style.padding = '0.5rem';
+                row.style.backgroundColor = '#f3f4f6';
+                row.style.borderRadius = '0.375rem';
+
+                row.innerHTML = `
+                    <div style="flex-grow:1; font-weight:500; font-size:0.9rem;">${u.name} <span style="color:#6b7280; font-size:0.8rem;">(${u.role})</span></div>
+                    <div style="display:flex; align-items:center; gap:0.25rem;">
+                        <span style="font-size:0.8rem; color:#4b5563;">Qty:</span>
+                        <input type="number" class="user-qty-input" data-userid="${id}" value="${u.quantity}" min="1" style="width: 3rem; padding: 0.25rem; border: 1px solid #d1d5db; border-radius: 0.25rem; text-align:center;">
+                    </div>
+                    <button type="button" class="remove-user-btn" data-userid="${id}" style="color:#ef4444; background:none; border:none; cursor:pointer; padding:0.25rem;">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </button>
+                `;
+                usersListContainer.appendChild(row);
+            });
+
+            // Re-attach listeners
+            document.querySelectorAll('.user-qty-input').forEach(input => {
+                input.addEventListener('input', (e) => {
+                    const uid = e.target.dataset.userid;
+                    const val = parseInt(e.target.value) || 0;
+                    if (assignedUsersData[uid]) {
+                        assignedUsersData[uid].quantity = val;
+                        updateTotalQuantity();
+                    }
+                });
+            });
+
+            document.querySelectorAll('.remove-user-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const uid = e.target.closest('button').dataset.userid;
+                    delete assignedUsersData[uid];
+                    renderUserRows();
+                    updateTotalQuantity();
+                });
+            });
+        }
+        updateTotalQuantity();
+    }
+
+    function updateTotalQuantity() {
+        let total = 0;
+        Object.values(assignedUsersData).forEach(u => total += u.quantity);
+
+        // Update either Split Qty or Main Qty depend on Mode
+        const moveMode = document.querySelector('input[name="move_mode"]:checked').value;
+        const currentAvail = availSelect.value;
+
+        if (currentAvail === 'IN USE') {
+            if (moveMode === 'split') {
+                splitQtyInput.value = total;
+            } else {
+                qtyInput.value = total;
+            }
+        }
+    }
+
+    addUserBtn.addEventListener('click', () => {
+        const uid = userSelectDropdown.value;
+        if (!uid) return;
+
+        if (assignedUsersData[uid]) {
+            alert('User already added.');
+            return;
+        }
+
+        const option = userSelectDropdown.options[userSelectDropdown.selectedIndex];
+        assignedUsersData[uid] = {
+            id: uid,
+            name: option.text, // Contains Name (Role)
+            role: '', // Extracted from text or ignored
+            quantity: 1
+        };
+        renderUserRows();
+        // Reset dropdown
+        userSelectDropdown.value = '';
+    });
+
 
     // Image Upload
     uploadWrapper.addEventListener('click', () => fileInput.click());
@@ -262,15 +352,27 @@ document.addEventListener('DOMContentLoaded', function () {
         const currentAvail = availSelect.value;
         if (currentStatus === 'N.G' && currentAvail !== 'NOT AVAILABLE') {
             alert("You cannot make this item available for use.");
-            alert("You cannot make this item available for use.");
             return;
         }
 
         // Validate Assigned Users if IN USE
+        let assignedUsersPayload = [];
         if (currentAvail === 'IN USE') {
-            const checkedBoxes = usersChecklist.querySelectorAll('input[type="checkbox"]:checked');
-            if (checkedBoxes.length === 0) {
-                alert("Please select at least one user who is using this item.");
+            const ids = Object.keys(assignedUsersData);
+            if (ids.length === 0) {
+                alert("Please add at least one user who is using this item.");
+                return;
+            }
+            assignedUsersPayload = Object.values(assignedUsersData).map(u => ({
+                user_id: u.id,
+                quantity: u.quantity
+            }));
+
+            // Check totals
+            let assignedTotal = 0;
+            assignedUsersPayload.forEach(p => assignedTotal += p.quantity);
+            if (assignedTotal <= 0) {
+                alert("Total assigned quantity must be greater than 0.");
                 return;
             }
         }
@@ -278,13 +380,14 @@ document.addEventListener('DOMContentLoaded', function () {
         const formData = new FormData(form);
         formData.append('_method', 'PUT');
 
-        // Check Split Mode
+        // Append structured users data
+        formData.append('assigned_users', JSON.stringify(assignedUsersPayload));
+
+        // Check Split Mode parameters
         const moveMode = document.querySelector('input[name="move_mode"]:checked').value;
         if (moveMode === 'split') {
-            // split_quantity is already in formData from the input
-            // validation is handled by 'required' and 'max' attrs
+            // split_quantity is in form
         } else {
-            // If 'Apply to All', ensure we DO NOT send split_quantity
             formData.delete('split_quantity');
         }
 
