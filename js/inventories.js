@@ -189,7 +189,8 @@ document.addEventListener('DOMContentLoaded', function () {
             usersBtn = `
                 <button type="button" class="btn-icon-action users-btn" data-users="${usersJson}" title="View Users" style="color: #2563eb;">
                     <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                     </svg>
                 </button>
             `;
@@ -260,12 +261,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         <span class="card-status ${statusClass}">${item.status_condition}</span>
                         <span class="card-status ${availClass}" style="margin-left:0.5rem;">${availText}</span>
                     </div>
-                    ${(item.availability_status === 'IN USE' && item.assigned_users && item.assigned_users.length > 0) ?
-                `<div style="color: #1e40af; font-size: 0.85rem; margin-top: 0.25rem; font-weight: 500;">
-                            <svg style="width:14px;height:14px;vertical-align:text-bottom;margin-right:2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                            ${item.assigned_users.map(u => u.firstname + ' ' + u.lastname).join(', ')}
-                         </div>`
-                : ''}
+
                     <div class="remarks-wrapper">
                          <div style="overflow: hidden; white-space: nowrap;">
                             <span class="remarks-text" style="display: inline-block; padding-left: 0; animation: marquee 10s linear infinite;">Remarks: ${item.remarks || 'NONE'}</span>
