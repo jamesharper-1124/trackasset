@@ -18,7 +18,7 @@
     <!-- Auth Guard (Handles 401 & Token) -->
     <script src="js/auth-guard.js?v=2"></script>
 
-    <script src="js/dashboard.js?v=2"></script>
+    <script src="js/dashboard.js?v=3"></script>
 </head>
 
 <body>
@@ -211,6 +211,27 @@
 
                         <!-- Left Column (Priority Data) -->
                         <div class="split-left">
+                            <!-- In Use Inventories (New) -->
+                            <div class="content-card mb-4">
+                                <div class="card-header-compact">
+                                    <h3>IN USE INVENTORIES</h3>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="data-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Inventory Name</th>
+                                                <th>Quantity</th>
+                                                <th>Status Condition</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="admin-in-use-body">
+                                            <!-- Populated by JS -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
                             <!-- Critical Issues -->
                             <div class="content-card mb-4">
                                 <div class="card-header-compact">
@@ -348,6 +369,26 @@
                     <div class="dashboard-split">
                         <!-- CARD 3: Recent Added (Your Rooms) -->
                         <div class="split-left">
+                            <!-- In Use Inventories (New) -->
+                            <div class="content-card mb-4">
+                                <div class="card-header-compact">
+                                    <h3>IN USE INVENTORIES</h3>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="data-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Inventory Name</th>
+                                                <th>Quantity</th>
+                                                <th>Status Condition</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="staff-in-use-body">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
                             <div class="content-card mb-4">
                                 <div class="card-header-compact">
                                     <h3>Recent Additions (Your Rooms)</h3>
@@ -399,9 +440,29 @@
                         <p class="text-secondary text-sm">Browse assets and report issues</p>
                     </div>
 
+                    <!-- In Use Inventories Table (New) -->
+                    <div class="content-card mb-4">
+                        <div class="card-header-compact">
+                            <h3>IN USE INVENTORIES</h3>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Inventory Name</th>
+                                        <th>Quantity</th>
+                                        <th>Status Condition</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="user-in-use-body">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
                     <!-- Grid of Small Cards (350px friendly) -->
-                    <div class="inventory-grid" id="user-inventory-grid" 
-                         style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 1rem;">
+                    <div class="inventory-grid" id="user-inventory-grid"
+                        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 1rem;">
                         <!-- Populated by JS -->
                     </div>
                 </div>
